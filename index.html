@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    
+    <script src="https://miro.com/app/static/sdk/v2/miro.js"></script>
+    <title>Facilitator Test</title>
+    <script type="module" crossorigin src="/assets/index.795af313.js"></script>
+    <link rel="stylesheet" href="/assets/index.f9186f78.css">
+  </head>
+  <body>
+    <div id="root" aria-hidden="true">
+      <div class="grid container">
+        <div class="cs1 ce12">
+          <img src="/assets/welcome.b7b73e7f.png" alt="" />
+        </div>
+        <div class="cs1 ce12">
+          <p style="font-size: large">Test, your app is running locally</p>
+          <p>
+            You can now create your Developer team to get your app running in
+            Miro.
+          </p>
+        </div>
+        <div class="cs1 ce12">
+          <a
+            class="button button-primary"
+            href="https://developers.miro.com/docs/create-a-developer-team"
+            target="_blank"
+          >
+            Create a Developer team
+          </a>
+        </div>
+        <div class="cs1 ce12">
+          <p>To see your app, open it in a app panel on Miro.com, or preview it at <a href="/app.html" class="link link-primary">this url</a></p>
+        </div>
+        <div class="cs1 ce12">
+          <button id="miro-auth-btn" class="button button-primary">Authorize Miro</button>
+        </div>
+        <div class="cs1 ce12">
+          <button id="miro-read-sticky-btn" class="button button-secondary" style="display:none;">Read Sticky Notes</button>
+        </div>
+      </div>
+    </div>
+    
+    <script>
+      const MIRO_CLIENT_ID = '3458764634969720763';
+      const MIRO_BOARD_ID = 'uXjVJcmr50A=';
+      let isMiroAuthorized = false;
+      const miroAuthBtn = document.getElementById('miro-auth-btn');
+      const miroReadBtn = document.getElementById('miro-read-sticky-btn');
+      miroAuthBtn.addEventListener('click', async () => {
+        if (!MIRO_CLIENT_ID || !MIRO_BOARD_ID) {
+          alert('Please set MIRO_CLIENT_ID and MIRO_BOARD_ID in the script.');
+          return;
+        }
+        try {
+          await miro.board.ui.requestConsent();
+          const isAuthorized = await miro.isAuthorized();
+          if (isAuthorized) {
+            isMiroAuthorized = true;
+            miroReadBtn.style.display = '';
+            alert('Miro authorized!');
+          } else {
+            alert('Authorization failed.');
+          }
+        } catch (err) {
+          alert('Error authorizing Miro.');
+        }
+      });
+      miroReadBtn.addEventListener('click', async () => {
+        if (!isMiroAuthorized) {
+          alert('Please authorize Miro first.');
+          return;
+        }
+        try {
+          const stickyNotes = await miro.board.get({ type: 'sticky_note' });
+          if (stickyNotes.length === 0) {
+            alert('No sticky notes found.');
+          } else {
+            stickyNotes.forEach(note => {
+              console.log('Sticky Note:', note.content || note.text || note.data || note);
+            });
+            alert(`Found ${stickyNotes.length} sticky notes. Check the console.`);
+          }
+        } catch (err) {
+          alert('Error reading sticky notes.');
+        }
+      });
+    </script>
+  </body>
+</html>
