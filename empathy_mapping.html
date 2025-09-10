@@ -1,0 +1,1574 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Empathy Mapping Workshop (1hr 45-mins)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body, html {
+            height: 100%;
+            overflow: hidden;
+            font-family: 'Inter', sans-serif;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        main {
+            position: relative;
+        }
+        .page {
+            position: absolute;
+            inset: 0;
+            padding: 2rem; /* 32px */
+            display: none;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+        }
+        .page.active {
+            display: flex;
+        }
+        .page#page-activity {
+            align-items: stretch;
+            justify-content: flex-start;
+            padding: 0;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px) scale(0.98); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+        .animate-fadeIn {
+            animation: fadeIn 0.5s ease-in-out forwards;
+        }
+        .miro-container {
+            height: 100%;
+            width: 100%;
+        }
+        .card-wrapper {
+            display: flex;
+        }
+        .empathy-map-text {
+            font-size: 16px;
+            font-family: 'Inter', sans-serif;
+            fill: #374151; /* gray-700 */
+            transition: all 0.3s ease-in-out;
+        }
+
+        /* Base size for the bold quadrant labels */
+        .empathy-map-text[font-weight="bold"], g.empathy-map-text text[font-weight="bold"] {
+            font-size: 20px;
+        }
+
+        /* This rule makes the active tutorial text bigger with a shadow */
+        .empathy-map-text.highlight, g.empathy-map-text.highlight text {
+            font-weight: 700;
+            fill: #111827; /* gray-900 */
+            font-size: 26px; /* Make it bigger */
+            filter: drop-shadow(2px 2px 3px rgba(0, 0, 0, 0.25)); /* Add shadow */
+        }
+
+        .persona-card {
+            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+        }
+        .persona-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+        }
+        .persona-card.selected {
+            transform: translateY(-5px) scale(1.02);
+            box-shadow: 0 0 0 4px #4f46e5; /* indigo-600 */
+            border-color: #4f46e5;
+        }
+
+        .group-btn.selected {
+            box-shadow: 0 0 0 4px #fbbf24; /* amber-400 ring */
+            transform: scale(1.05);
+        }
+        #cards-column, #miro-column {
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .resize-handle {
+            cursor: col-resize;
+            background: linear-gradient(90deg, transparent 0%, #d1d5db 45%, #9ca3af 50%, #d1d5db 55%, transparent 100%);
+            transition: background-color 0.2s ease;
+        }
+        .resize-handle:hover {
+            background: linear-gradient(90deg, transparent 0%, #9ca3af 45%, #6b7280 50%, #9ca3af 55%, transparent 100%);
+        }
+        .resize-handle.dragging {
+            background: linear-gradient(90deg, transparent 0%, #6366f1 45%, #4f46e5 50%, #6366f1 55%, transparent 100%);
+        }
+        
+        /* Persona Selection Scrolling */
+        #page-persona-selection > div {
+            max-height: calc(100vh - 60px - 4rem); /* Header + page y-padding */
+            overflow-y: auto;
+        }
+        #page-persona-selection > div::-webkit-scrollbar {
+            width: 12px;
+        }
+        #page-persona-selection > div::-webkit-scrollbar-track {
+            background: #f8fafc; /* slate-50 */
+            border-radius: 10px;
+        }
+        #page-persona-selection > div::-webkit-scrollbar-thumb {
+            background-color: #cbd5e1; /* slate-300 */
+            border-radius: 20px;
+            border: 3px solid #f8fafc; /* slate-50 */
+        }
+        #page-persona-selection > div::-webkit-scrollbar-thumb:hover {
+            background-color: #94a3b8; /* slate-400 */
+        }
+
+        /* Custom persona name display styling */
+        .custom-persona-name {
+            font-size: 14px;
+            font-weight: 600;
+            line-height: 1.2;
+            text-align: center;
+            word-break: break-word;
+            padding: 4px;
+        }
+
+    </style>
+</head>
+<body class="bg-gray-100">
+
+    <div id="app-container" class="h-screen flex flex-col">
+        <!-- Header -->
+        <header id="main-header" class="bg-white shadow-md p-3 h-[60px] flex items-center justify-between sticky top-0 z-40 w-full flex-shrink-0">
+            <div class="w-28">
+                <button id="back-btn" class="flex items-center gap-2 text-gray-700 hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed transition-colors rounded-lg py-2 px-3 font-bold text-base">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd" /></svg>
+                    Back
+                </button>
+            </div>
+            <h1 id="header-title" class="text-lg md:text-xl font-bold text-gray-800 text-center"></h1>
+            <div class="w-28">
+                <button id="next-btn" class="flex items-center gap-2 text-white bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors rounded-lg py-2 px-3 font-bold text-base">
+                    Next
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" /></svg>
+                </button>
+            </div>
+        </header>
+
+        <!-- Main Content Area -->
+        <main class="flex-grow overflow-hidden">
+            
+            <!-- Page 0: Introduction -->
+            <div id="page-intro" class="page active">
+                <div class="bg-white p-12 rounded-2xl shadow-2xl max-w-4xl w-full text-center border border-gray-200 animate-fadeIn">
+                    <h1 class="text-4xl font-bold text-gray-800 mb-6">Welcome to the Empathy Mapping Workshop</h1>
+                    <p class="text-xl text-gray-600 mb-8 leading-relaxed">A collaborative tool to understand stakeholder experiences and uncover AI benefits, risks, and mitigations.</p>
+                     <p class="text-lg text-red-600 font-bold">Note: This experience is not supported on Safari. Please use Google Chrome or Mozilla Firefox.</p>
+                    <p class="text-md text-gray-500 mb-6">Click "Next" to begin.</p>
+                    <div class="flex justify-center gap-4">
+                        <button id="intro-questionnaire-btn" class="bg-gray-600 text-white hover:bg-gray-700 transition-colors rounded-lg py-2 px-6 font-medium text-base" onclick="window.open('https://forms.office.com/e/hCc2c58wLQ', '_blank')">Go to Questionnaire</button>
+                        <button id="intro-skip-to-demo-btn" class="bg-indigo-600 text-white hover:bg-indigo-700 transition-colors rounded-lg py-3 px-8 font-bold text-lg">Skip to Demo</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Page 1: Our Plan -->
+            <div id="page-plan" class="page">
+                <div class="bg-white p-12 rounded-2xl shadow-2xl max-w-4xl w-full text-left border border-gray-200 animate-fadeIn">
+                    <h1 class="text-4xl font-bold text-gray-800 mb-6">Empathy Mapping Workshop</h1>
+                    <p class="text-lg text-gray-600 mb-8 leading-relaxed">
+                        <strong>Introduction and warm-up task (10 min):</strong> We will start with team introductions and a quick warm-up exercise to get everyone thinking about different user perspectives.
+                        <br><br><strong>Brief tutorial (5 min):</strong> We will show you how empathy mapping works step by step.
+                        <br><br><strong>Select personas (5 min):</strong> Choose two personas: one similar to your team and one very different.
+                        <br><br><strong>Create empathy maps (40 min):</strong> Working in teams, you will map what each persona sees, hears, says, does, thinks, and feels.
+                        <br><br><strong>Analyse and ideate (30 min):</strong> Finally, you will identify key <em>benefits</em>, <em>risks</em>, and <em>mitigations</em> based on your empathy maps.
+                        <br><br><strong>Workshop conclusion (5 min):</strong> We will wrap up with key takeaways and reflections on the process.
+                        <br><br><strong>Complete Post-study Questionnaire (10 min):</strong> Finally, you will each complete a post-study questionnaire on your experience with this workshop and for identifying AI benefits, risks and mitigations.
+                    </p>
+                    <p class="text-md text-gray-500">Click "Next" to continue.</p>
+                </div>
+            </div>
+
+            <!-- Page 2: Icebreaker Task -->
+            <div id="page-icebreaker" class="page">
+                <div class="bg-white p-8 rounded-2xl shadow-2xl max-w-6xl w-full border border-gray-200 animate-fadeIn">
+                    <h1 class="text-4xl font-bold text-gray-800 mb-6 text-center">Icebreaker Task</h1>
+                    <div class="flex flex-col lg:flex-row gap-8 items-start">
+                        <!-- Left side: Instructions -->
+                        <div class="w-full lg:w-1/2">
+                            <h2 class="text-2xl font-semibold text-gray-800 mb-4">POLAK TASK (ICEBREAKER):</h2>
+                            <p class="text-lg text-gray-600 mb-6 leading-relaxed">
+                                Before we dive into the Empathy Mapping activity, let's start with a quick icebreaker to get everyone thinking about AI and our ability to influence its future.
+                            </p>
+                            <div class="bg-gray-50 p-6 rounded-lg mb-6">
+                                <p class="text-lg text-gray-700 mb-4">Consider the following two dimensions in the context of <strong>the future of AI</strong>:</p>
+                                <ul class="text-lg text-gray-700 space-y-2 ml-4">
+                                    <li><strong>Y-axis:</strong> Optimistic vs. Pessimistic about AI's impact</li>
+                                    <li><strong>X-axis:</strong> Cannot make a difference vs. Can make a difference in shaping AI's future</li>
+                                </ul>
+                            </div>
+                            <p class="text-lg text-gray-600 mb-4">
+                                Think about where you would place yourself on these two axes and be ready to share your position with the group.
+                            </p>
+                        </div>
+                        
+                        <!-- Right side: Quadrant Plot -->
+                        <div class="w-full lg:w-1/2 flex justify-center">
+                            <div class="relative w-80 h-80 bg-white border-2 border-gray-300 rounded-lg shadow-sm">
+                                <!-- Axes -->
+                                <div class="absolute left-1/2 top-0 w-px h-full bg-gray-400"></div>
+                                <div class="absolute top-1/2 left-0 w-full h-px bg-gray-400"></div>
+                                
+                                <!-- Quadrant Labels -->
+                                <div class="absolute top-6 left-6 text-center">
+                                    <div class="text-sm font-semibold text-green-600">Optimistic</div>
+                                    <div class="text-xs text-gray-500 mt-1">Cannot influence</div>
+                                </div>
+                                
+                                <div class="absolute top-6 right-6 text-center">
+                                    <div class="text-sm font-semibold text-green-600">Optimistic</div>
+                                    <div class="text-xs text-gray-500 mt-1">Can influence</div>
+                                </div>
+                                
+                                <div class="absolute bottom-6 left-6 text-center">
+                                    <div class="text-sm font-semibold text-red-600">Pessimistic</div>
+                                    <div class="text-xs text-gray-500 mt-1">Cannot influence</div>
+                                </div>
+                                
+                                <div class="absolute bottom-6 right-6 text-center">
+                                    <div class="text-sm font-semibold text-red-600">Pessimistic</div>
+                                    <div class="text-xs text-gray-500 mt-1">Can influence</div>
+                                </div>
+                                
+                                <!-- Axis Labels -->
+                                <div class="absolute -top-8 left-1/2 transform -translate-x-1/2 text-sm font-medium text-gray-600">
+                                    Optimistic
+                                </div>
+                                <div class="absolute -bottom-8 left-1/2 transform -translate-x-1/2 text-sm font-medium text-gray-600">
+                                    Pessimistic
+                                </div>
+                                <div class="absolute top-1/2 -left-16 transform -translate-y-1/2 -rotate-90 text-sm font-medium text-gray-600">
+                                    Cannot influence
+                                </div>
+                                <div class="absolute top-1/2 -right-16 transform -translate-y-1/2 rotate-90 text-sm font-medium text-gray-600">
+                                    Can influence
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <p class="text-md text-gray-500 mt-6 text-center">Click "Next" to continue to the tutorial.</p>
+                </div>
+            </div>
+
+            <!-- Page 3: Group Selection -->
+            <div id="page-groupSelection" class="page">
+                <div class="bg-white p-12 rounded-2xl shadow-2xl max-w-4xl w-full text-center border border-gray-200 animate-fadeIn">
+                    <h1 class="text-4xl font-bold text-gray-800 mb-6">Select Your Group</h1>
+                    <p class="text-lg text-gray-600 mb-8 leading-relaxed">
+                        Please select your assigned workshop number by clicking one of the buttons below.
+                    </p>
+                    <div class="flex justify-center gap-4 mb-8">
+                        <button id="group-3-btn" class="group-btn bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg text-lg transition-colors shadow-lg transform hover:scale-105" data-group="3">
+                            Workshop 3
+                        </button>
+                        <button id="group-6-btn" class="group-btn bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-6 rounded-lg text-lg transition-colors shadow-lg transform hover:scale-105" data-group="6">
+                            Workshop 5
+                        </button>
+                        <button id="group-7-btn" class="group-btn bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 px-6 rounded-lg text-lg transition-colors shadow-lg transform hover:scale-105" data-group="7">
+                            Workshop 7
+                        </button>
+                        <button id="group-11-btn" class="group-btn bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-6 rounded-lg text-lg transition-colors shadow-lg transform hover:scale-105" data-group="11">
+                            Workshop 11
+                        </button>
+                    </div>
+                    <p class="text-md text-gray-500">After selecting your workshop, you'll see your AI use case.</p>
+                </div>
+            </div>
+
+            <!-- Page 4: AI Use Case -->
+            <div id="page-useCase" class="page">
+                <div class="bg-white p-12 rounded-2xl shadow-2xl max-w-4xl w-full text-center border border-gray-200 animate-fadeIn">
+                    <h1 id="usecase-title" class="text-3xl font-bold text-gray-800 mb-6">The AI Use Case</h1>
+                    <img id="usecase-image" src="" alt="AI Use Case" class="rounded-lg shadow-md mb-8 w-full object-cover border border-gray-200" onerror="this.onerror=null;this.src='https://placehold.co/800x450/e2e8f0/64748b?text=Image+not+available';">
+                    <p id="usecase-description" class="text-lg text-gray-600 mb-4 leading-relaxed">We will use this AI use case for our Empathy Mapping exercise.</p>
+                    <p class="text-md text-gray-500">Click "Next" to learn how empathy mapping works.</p>
+                </div>
+            </div>
+
+            <!-- Page 5: Tutorial -->
+             <div id="page-tutorial" class="page">
+                 <div class="bg-white p-8 rounded-2xl shadow-2xl w-full max-w-6xl border border-gray-200 animate-fadeIn flex flex-col lg:flex-row gap-8">
+                     <div id="tutorial-viz-container" class="w-full lg:w-1/2 h-[550px] bg-gray-50 rounded-lg p-4 relative flex items-center justify-center overflow-hidden">
+                         <!-- Tutorial SVG will be injected here -->
+                     </div>
+                     <div class="w-full lg:w-1/2 flex flex-col justify-center">
+                         <h2 class="text-3xl font-bold text-gray-800 mb-4">How Empathy Mapping Works</h2>
+                         <div id="tutorial-text-container" class="bg-gray-100 p-6 rounded-lg min-h-[300px] flex items-center mb-6">
+                             <p class="text-base text-gray-700 leading-relaxed"></p>
+                         </div>
+                         <div class="flex justify-between items-center">
+                             <button id="tutorial-prev-btn" class="bg-gray-300 text-gray-700 font-bold py-2 px-4 rounded-lg hover:bg-gray-400 disabled:opacity-50"></button>
+                             <div id="tutorial-step-indicator" class="text-sm text-gray-500"></div>
+                             <button id="tutorial-next-btn" class="bg-indigo-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-indigo-700 disabled:opacity-50"></button>
+                         </div>
+                     </div>
+                 </div>
+             </div>
+
+               <!-- Page 6: Rules -->
+            <div id="page-rules" class="page">
+                <div class="bg-white p-12 rounded-2xl shadow-2xl max-w-3xl w-full text-center border border-gray-200 animate-fadeIn">
+                    <h1 class="text-4xl font-bold text-gray-800 mb-4">Nominate a Team Coordinator</h1>
+                    <p class="text-lg text-gray-600 mb-6 leading-relaxed">
+                        First, please nominate one person in your team to be the <strong>Coordinator</strong>. This person will be responsible for adding your team's ideas to the Miro board. The rest of your team will be 'Viewers'.
+                    </p>
+                    <p class="text-lg text-gray-600 mb-6 leading-relaxed">
+                        A key principle of Empathy Mapping is ensuring that all insights are plausible. Before the Coordinator adds an idea to the board, your team must first discuss it and agree that it is a plausible insight.
+                    </p>
+                    <div class="flex justify-center gap-6">
+                         <button id="viewer-btn" class="bg-gray-600 text-white hover:bg-gray-700 transition-colors rounded-lg py-3 px-8 font-bold text-lg">I'm a Viewer</button>
+                         <button id="coordinator-btn" class="bg-indigo-600 text-white hover:bg-indigo-700 transition-colors rounded-lg py-3 px-8 font-bold text-lg">I'm the Coordinator</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Page 7: Demo and Miro Help -->
+            <div id="page-demo" class="page">
+                <div class="flex flex-col h-full w-full relative">
+                    <div id="demo-intro-overlay" class="absolute inset-0 bg-gray-900 bg-opacity-95 z-50 flex flex-col items-center justify-center p-8 transition-opacity duration-500">
+                        <!-- Demo intro content will be injected by JS -->
+                    </div>
+
+                    <div id="demo-header" class="w-full bg-white p-2 h-[50px] flex-shrink-0 flex items-center justify-between border-b border-gray-200 opacity-0 transition-opacity duration-300">
+                        <div class="w-1/4 pl-6 flex justify-start items-center gap-4">
+                            <button id="demo-collapse-cards-btn" class="hidden text-sm font-semibold text-gray-600 hover:bg-gray-200 py-1 px-2 rounded-lg transition-colors"><b>Close Idea Cards</b></button>
+                            <button id="demo-expand-cards-btn" class="text-sm font-semibold text-green-600 hover:bg-gray-200 py-1 px-2 rounded-lg transition-colors"><b>Need inspiration? Open Cards</b></button>
+                        </div>
+                        <!-- Right content -->
+                        <div class="w-1/4 text-right pr-6 flex justify-end items-center">
+                        </div>
+                    </div>
+                    <main id="demo-main-content" class="flex-grow flex gap-4 p-4 overflow-hidden opacity-0 transition-opacity duration-300">
+                        <div id="demo-left-column" class="flex-col gap-4 h-full overflow-y-auto hidden" style="min-width: 300px; max-width: 60%; width: 400px; flex-shrink: 0;">
+                            <div class="bg-white p-4 rounded-lg shadow-md border border-gray-200 flex-shrink-0">
+                                <h3 id="demo-cards-column-title" class="text-lg font-bold text-gray-800 mb-2">Risk Cards</h3>
+                                <p id="demo-cards-column-instruction" class="text-sm text-gray-600 leading-relaxed">Use these cards for context and inspiration.</p>
+                                <div id="demo-card-toggle-buttons" class="mt-4 flex gap-2">
+                                    <button id="demo-show-risks-btn" class="bg-red-100 text-red-700 font-semibold py-1 px-3 rounded-md text-sm">Show Risks</button>
+                                    <button id="demo-show-mitigations-btn" class="bg-blue-100 text-blue-700 font-semibold py-1 px-3 rounded-md text-sm">Show Mitigations</button>
+                                </div>
+                            </div>
+                            <div id="demo-cards-container" class="grid grid-cols-1 md:grid-cols-1 gap-4 p-1">
+                                <!-- Demo cards will be injected here -->
+                            </div>
+                        </div>
+                        <div id="demo-resize-handle" class="resize-handle w-2 cursor-col-resize hidden"></div>
+                        <div id="demo-miro-column" class="flex flex-col h-full flex-grow transition-all duration-500">
+                            <div class="flex-grow bg-white p-1 rounded-lg shadow-md border border-gray-200">
+                                <div class="miro-container border-2 border-gray-300 rounded-lg shadow-inner overflow-hidden h-full w-full">
+                                    <iframe title="Demo Miro Board" width="100%" height="100%" src="" frameborder="0" scrolling="no" allow="fullscreen; clipboard-read; clipboard-write" allowfullscreen></iframe>
+                                </div>
+                            </div>
+                        </div>
+                    </main>
+                </div>
+            </div>
+
+            <!-- Page 8: Persona Selection -->
+            <div id="page-persona-selection" class="page">
+                <div class="bg-white py-12 pl-12 pr-10 rounded-2xl shadow-2xl max-w-6xl w-full text-center border border-gray-200 animate-fadeIn">
+                    <h1 class="text-3xl font-bold text-gray-800 mb-2">Select Your Two Personas</h1>
+                    <p class="text-lg text-gray-600 mb-8">As a team, select the same two personas for this activity. Choose one that your team can most relate to, and one that is most different from your team.</p>
+                    
+                    <!-- Custom Persona Input - Now at the top -->
+                    <div class="mb-8">
+                        <h2 class="text-xl font-semibold text-gray-700 mb-4">Create your own personas:</h2>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <!-- Custom Persona 1 -->
+                            <div id="custom-persona-1" class="persona-card bg-white rounded-lg shadow-md p-4 border-2 border-transparent transition-all">
+                                <div class="w-full h-32 bg-gradient-to-br from-purple-400 to-purple-600 rounded-md mb-4 flex items-center justify-center">
+                                    <div id="custom-preview-1" class="text-white custom-persona-name">Enter name...</div>
+                                </div>
+                                <div class="mb-3">
+                                    <input type="text" id="custom-name-1" class="w-full text-xl font-bold text-gray-800 bg-transparent border-b-2 border-gray-200 focus:border-indigo-500 focus:outline-none pb-1" placeholder="Enter name...">
+                                </div>
+                                <div class="mb-4">
+                                    <textarea id="custom-desc-1" class="w-full text-gray-600 bg-transparent border border-gray-200 rounded-md p-2 focus:border-indigo-500 focus:outline-none h-20 resize-none" placeholder="Describe this persona..."></textarea>
+                                </div>
+                                <button id="add-custom-1" class="w-full bg-indigo-600 text-white py-2 px-4 rounded-md hover:bg-indigo-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-sm font-medium" disabled>Create and Choose This Persona</button>
+                            </div>
+
+                            <!-- Custom Persona 2 -->
+                            <div id="custom-persona-2" class="persona-card bg-white rounded-lg shadow-md p-4 border-2 border-transparent transition-all">
+                                <div class="w-full h-32 bg-gradient-to-br from-amber-400 to-amber-600 rounded-md mb-4 flex items-center justify-center">
+                                    <div id="custom-preview-2" class="text-white custom-persona-name">Enter name...</div>
+                                </div>
+                                <div class="mb-3">
+                                    <input type="text" id="custom-name-2" class="w-full text-xl font-bold text-gray-800 bg-transparent border-b-2 border-gray-200 focus:border-indigo-500 focus:outline-none pb-1" placeholder="Enter name...">
+                                </div>
+                                <div class="mb-4">
+                                    <textarea id="custom-desc-2" class="w-full text-gray-600 bg-transparent border border-gray-200 rounded-md p-2 focus:border-indigo-500 focus:outline-none h-20 resize-none" placeholder="Describe this persona..."></textarea>
+                                </div>
+                                <button id="add-custom-2" class="w-full bg-indigo-600 text-white py-2 px-4 rounded-md hover:bg-indigo-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-sm font-medium" disabled>Create and Choose This Persona</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Predefined Personas - Now below custom personas -->
+                    <div class="border-t pt-8">
+                        <h2 class="text-xl font-semibold text-gray-700 mb-4">Or choose from these personas:</h2>
+                        <div id="persona-grid" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <!-- Persona cards will be injected by JS -->
+                        </div>
+                    </div>
+
+                    <!-- Selection Status -->
+                    <div class="mt-8 p-4 bg-gray-100 rounded-lg">
+                        <p class="text-sm text-gray-600 mb-2">Selected personas:</p>
+                        <div id="selection-status" class="text-sm text-gray-800">
+                            <span id="persona-1-status">Persona 1: Not selected</span><br>
+                            <span id="persona-2-status">Persona 2: Not selected</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Page 9: Activity -->
+            <div id="page-persona-selection" class="page">
+                <div class="bg-white py-12 pl-12 pr-10 rounded-2xl shadow-2xl max-w-6xl w-full text-center border border-gray-200 animate-fadeIn">
+                    <h1 class="text-3xl font-bold text-gray-800 mb-2">Select Your Two Personas</h1>
+                    <p class="text-lg text-gray-600 mb-8">As a team, select the same two personas for this activity. Choose one that your team can most relate to, and one that is most different from your team.</p>
+                    
+                    <!-- Custom Persona Input - Now at the top -->
+                    <div class="mb-8">
+                        <h2 class="text-xl font-semibold text-gray-700 mb-4">Create your own personas:</h2>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <!-- Custom Persona 1 -->
+                            <div id="custom-persona-1" class="persona-card bg-white rounded-lg shadow-md p-4 border-2 border-transparent transition-all">
+                                <div class="w-full h-32 bg-gradient-to-br from-purple-400 to-purple-600 rounded-md mb-4 flex items-center justify-center">
+                                    <div id="custom-preview-1" class="text-white custom-persona-name">Enter name...</div>
+                                </div>
+                                <div class="mb-3">
+                                    <input type="text" id="custom-name-1" class="w-full text-xl font-bold text-gray-800 bg-transparent border-b-2 border-gray-200 focus:border-indigo-500 focus:outline-none pb-1" placeholder="Enter name...">
+                                </div>
+                                <div class="mb-4">
+                                    <textarea id="custom-desc-1" class="w-full text-gray-600 bg-transparent border border-gray-200 rounded-md p-2 focus:border-indigo-500 focus:outline-none h-20 resize-none" placeholder="Describe this persona..."></textarea>
+                                </div>
+                                <button id="add-custom-1" class="w-full bg-indigo-600 text-white py-2 px-4 rounded-md hover:bg-indigo-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-sm font-medium" disabled>Create and Choose This Persona</button>
+                            </div>
+
+                            <!-- Custom Persona 2 -->
+                            <div id="custom-persona-2" class="persona-card bg-white rounded-lg shadow-md p-4 border-2 border-transparent transition-all">
+                                <div class="w-full h-32 bg-gradient-to-br from-amber-400 to-amber-600 rounded-md mb-4 flex items-center justify-center">
+                                    <div id="custom-preview-2" class="text-white custom-persona-name">Enter name...</div>
+                                </div>
+                                <div class="mb-3">
+                                    <input type="text" id="custom-name-2" class="w-full text-xl font-bold text-gray-800 bg-transparent border-b-2 border-gray-200 focus:border-indigo-500 focus:outline-none pb-1" placeholder="Enter name...">
+                                </div>
+                                <div class="mb-4">
+                                    <textarea id="custom-desc-2" class="w-full text-gray-600 bg-transparent border border-gray-200 rounded-md p-2 focus:border-indigo-500 focus:outline-none h-20 resize-none" placeholder="Describe this persona..."></textarea>
+                                </div>
+                                <button id="add-custom-2" class="w-full bg-indigo-600 text-white py-2 px-4 rounded-md hover:bg-indigo-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-sm font-medium" disabled>Create and Choose This Persona</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Predefined Personas - Now below custom personas -->
+                    <div class="border-t pt-8">
+                        <h2 class="text-xl font-semibold text-gray-700 mb-4">Or choose from these personas:</h2>
+                        <div id="persona-grid" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <!-- Persona cards will be injected by JS -->
+                        </div>
+                    </div>
+
+                    <!-- Selection Status -->
+                    <div class="mt-8 p-4 bg-gray-100 rounded-lg">
+                        <p class="text-sm text-gray-600 mb-2">Selected personas:</p>
+                        <div id="selection-status" class="text-sm text-gray-800">
+                            <span id="persona-1-status">Persona 1: Not selected</span><br>
+                            <span id="persona-2-status">Persona 2: Not selected</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Page 6: Activity -->
+            <div id="page-activity" class="page">
+                <div class="flex flex-col h-full w-full relative">
+                    <!-- Stage Change Notification Modal -->
+                    <div id="stage-change-modal" class="hidden absolute inset-0 bg-black bg-opacity-70 z-[70] flex items-center justify-center p-4">
+                        <div class="bg-white rounded-lg shadow-xl p-8 text-center animate-fadeIn w-full max-w-lg">
+                            <h3 id="stage-change-title" class="text-2xl font-bold mb-2 text-gray-800">Time's up!</h3>
+                            <p id="stage-change-description" class="text-lg text-gray-600 mb-6 leading-relaxed"></p>
+                            <button id="stage-change-close-btn" class="bg-indigo-600 text-white font-bold py-2 px-8 rounded-lg hover:bg-indigo-700">Let's Go!</button>
+                        </div>
+                    </div>
+
+                    <div id="activity-header" class="w-full bg-white p-3 h-16 flex-shrink-0 flex items-center justify-between border-b border-gray-200">
+                        <div class="w-1/4 pl-4 flex justify-start items-center gap-3">
+                           <button id="collapse-cards-btn" class="hidden text-sm font-semibold text-gray-600 hover:bg-gray-200 py-1 px-2 rounded-lg transition-colors"><b>Close Idea Cards</b></button>
+                           <button id="expand-cards-btn" class="hidden text-sm font-semibold text-green-600 hover:bg-gray-200 py-1 px-2 rounded-lg transition-colors"><b>Need additional inspiration?<br>Open Idea Cards</b></button>
+                        </div>
+                        <div id="activity-step-container" class="w-1/2 text-center transition-all duration-300">
+                             <h2 id="activity-step-title" class="text-lg font-semibold"></h2>
+                             <p id="activity-step-description" class="text-sm text-gray-600"></p>
+                        </div>
+                        <div class="w-1/4 text-right pr-4 flex justify-end items-center">
+                            <span id="activity-timer" class="text-3xl font-bold"></span>
+                        </div>
+                    </div>
+                    <main id="activity-main-content" class="flex-grow flex gap-4 p-4 overflow-hidden">
+                        <div id="cards-column" class="flex-col gap-4 h-full overflow-y-auto hidden" style="min-width: 300px; max-width: 60%; width: 400px; flex-shrink: 0;">
+                            <div class="bg-white p-4 rounded-lg shadow-md border border-gray-200 flex-shrink-0">
+                                <h3 id="cards-column-title" class="text-lg font-bold text-gray-800 mb-2">Inspiration Cards</h3>
+                                <p id="cards-column-instruction" class="text-sm text-gray-600 leading-relaxed">Use these cards for context and inspiration.</p>
+                                <div id="card-toggle-buttons" class="mt-4 flex gap-2">
+                                    <button id="show-risks-btn" class="bg-red-100 text-red-700 font-semibold py-1 px-3 rounded-md text-sm">Show Risks</button>
+                                    <button id="show-mitigations-btn" class="bg-blue-100 text-blue-700 font-semibold py-1 px-3 rounded-md text-sm">Show Mitigations</button>
+                                </div>
+                            </div>
+                            <div id="cards-container" class="grid grid-cols-1 md:grid-cols-1 gap-4 p-1">
+                                <!-- Idea cards will be injected here -->
+                            </div>
+                        </div>
+                        <div id="resize-handle" class="resize-handle w-2 cursor-col-resize hidden"></div>
+                        <div id="miro-column" class="flex flex-col h-full flex-grow transition-all duration-500">
+                            <div class="flex-grow bg-white p-1 rounded-lg shadow-md border border-gray-200">
+                                <div class="miro-container border-2 border-gray-300 rounded-lg shadow-inner overflow-hidden h-full w-full">
+                                    <iframe title="Miro Board" width="100%" height="100%" src="" frameborder="0" scrolling="no" allow="fullscreen; clipboard-read; clipboard-write" allowfullscreen></iframe>
+                                </div>
+                            </div>
+                        </div>
+                    </main>
+                </div>
+            </div>
+
+            <!-- Page 10: Discussion -->
+            <div id="page-discussion" class="page">
+                <div class="bg-white p-12 rounded-2xl shadow-2xl max-w-4xl w-full text-center border border-gray-200 animate-fadeIn">
+                    <h1 class="text-4xl font-bold text-gray-800 mb-6">Discussion Time</h1>
+                    <div class="text-left max-w-3xl mx-auto">
+                        <div class="bg-indigo-50 p-6 rounded-lg mb-6 border border-indigo-200">
+                            <h2 class="text-2xl font-semibold text-indigo-800 mb-4 text-center">5-Minute Team Discussion</h2>
+                            <p class="text-xl text-indigo-700 text-center font-medium">
+                                "What's one idea from today that you might share with a friend or family member?"
+                            </p>
+                        </div>
+                        <p class="text-lg text-gray-600 mb-6 leading-relaxed text-center">
+                            Take a few minutes to discuss this question with your team. Think about the insights, tools, or perspectives you've gained from the Empathy Mapping exercise that could be valuable to share with others.
+                        </p>
+                    </div>
+                    <div class="flex justify-center gap-6 mt-8">
+                         <button id="discussion-continue-btn" class="bg-indigo-600 text-white hover:bg-indigo-700 transition-colors rounded-lg py-3 px-8 font-bold text-lg">Continue to Questionnaire</button>
+                    </div>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', () => {
+        // --- Miro Board URLs ---
+        const MIRO_URLS = {
+            demo: {
+                coordinator: 'https://miro.com/app/live-embed/uXjVJbd_1vQ=/?moveToViewport=-3251%2C-1749%2C7616%2C2444&embedId=259405839852&autoplay=yep&embedAutoplay=true',
+                viewer: 'https://miro.com/app/live-embed/uXjVJbd_1vQ=/?embedMode=view_only_without_ui&moveToViewport=-3251%2C-1749%2C7616%2C2444&embedId=259405839852&autoplay=yep&embedAutoplay=true'
+            },
+            mainBoards: {
+                '3': {
+                    coordinator: 'https://miro.com/app/live-embed/uXjVJeTPzkc=/?moveToViewport=-3191%2C-1761%2C7652%2C2150&embedId=187893805194&autoplay=yep&embedAutoplay=true',
+                    viewer: 'https://miro.com/app/live-embed/uXjVJeTPzkc=/?embedMode=view_only_without_ui&moveToViewport=-3158%2C-1767%2C7614%2C2150&embedId=242332386732&autoplay=yep&embedAutoplay=true'
+                },
+                '6': {
+                    coordinator: 'https://miro.com/app/live-embed/uXjVJZjnOtQ=/?moveToViewport=-3179%2C-1757%2C7590%2C2130&embedId=565861533894&autoplay=yep&embedAutoplay=true',
+                    viewer: 'https://miro.com/app/live-embed/uXjVJZjnOtQ=/?embedMode=view_only_without_ui&moveToViewport=-3194%2C-1772%2C7613%2C2144&embedId=523174147435&autoplay=yep&embedAutoplay=true'
+                },
+                '7': {
+                    coordinator: 'https://miro.com/app/live-embed/uXjVJZXusRQ=/?moveToViewport=-3243%2C-1793%2C6111%2C2209&embedId=950144607606&autoplay=yep&embedAutoplay=true',
+                    viewer: 'https://miro.com/app/live-embed/uXjVJZXusRQ=/?embedMode=view_only_without_ui&moveToViewport=-3243%2C-1793%2C6111%2C2209&embedId=950144607606&autoplay=yep&embedAutoplay=true'
+                },
+                '11': {
+                    coordinator: 'https://miro.com/app/live-embed/uXjVJaXP6wo=/?moveToViewport=-3347%2C-1775%2C7771%2C2167&embedId=463594457883&autoplay=yep&embedAutoplay=true',
+                    viewer: 'https://miro.com/app/live-embed/uXjVJaXP6wo=/?embedMode=view_only_without_ui&moveToViewport=-3407%2C-1775%2C7825%2C2145&embedId=913413665745&autoplay=yep&embedAutoplay=true'
+                }
+            }
+        };
+
+        // Add viewer/coordinator role selection
+        let userRole = null; // 'viewer' or 'coordinator'
+        // --- State Management ---
+        const pageSequence = ['intro', 'plan', 'icebreaker', 'tutorial', 'rules', 'demo', 'groupSelection', 'useCase', 'persona-selection', 'activity', 'discussion'];
+        let currentPageIndex = 0;
+        let selectedPersonas = [];
+        let selectedGroup = null;
+        let currentActivityStep = -1;
+        let countdownInterval;
+        let isCardsCollapsed = true;
+        let miroLoaded = false; // Track if Miro board has been loaded
+
+        // Update the pageTitles object:
+        const pageTitles = {
+            intro: 'Introduction ',
+            plan: 'Our Plan for Today',
+            icebreaker: 'Icebreaker Task',
+            groupSelection: 'Group Selection',
+            useCase: 'AI Use Introduction',
+            tutorial: 'Tutorial',
+            rules: 'The Rule of Unanimity',
+            demo: 'Demo and Miro Help',
+            'persona-selection': 'Select Your Personas',
+            activity: 'Empathy Mapping Activity',
+            discussion: 'Discussion'
+        };
+
+        const personas = [
+            { id: 'Naka', name: 'Naka', description: 'A recently retired elderly widower, type 1 diabetic.', image: 'https://placehold.co/400x300/a5b4fc/1e1b4b?text=Naka' },
+            { id: 'Alexis', name: 'Alexis', description: 'A former-professor currently on trial for attempted murder and espionage.', image: 'https://placehold.co/400x300/93c5fd/1e3a8a?text=Alexis' },
+            { id: 'Judy', name: 'Judy', description: 'A middle-aged consultant, 6-months pregnant.', image: 'https://placehold.co/400x300/f9a8d4/831843?text=Judy' },
+            { id: 'Ruka', name: 'Ruka', description: 'A 20-year old 2nd year university student, with a congenital defect meaning that they are unlikely to live past 30.', image: 'https://placehold.co/400x300/a7f3d0/064e3b?text=Ruka' }
+        ];
+
+        let activitySteps = []; // Will be populated after personas are selected
+
+        // --- DOM Elements ---
+        // Update the pages object:
+        const pages = {
+            intro: document.getElementById('page-intro'),
+            plan: document.getElementById('page-plan'),
+            icebreaker: document.getElementById('page-icebreaker'),
+            groupSelection: document.getElementById('page-groupSelection'),
+            useCase: document.getElementById('page-useCase'),
+            tutorial: document.getElementById('page-tutorial'),
+            rules: document.getElementById('page-rules'),
+            demo: document.getElementById('page-demo'),
+            'persona-selection': document.getElementById('page-persona-selection'),
+            activity: document.getElementById('page-activity'),
+            discussion: document.getElementById('page-discussion')
+        };
+        const headerTitle = document.getElementById('header-title');
+        const backBtn = document.getElementById('back-btn');
+        const nextBtn = document.getElementById('next-btn');
+        const stageChangeModal = document.getElementById('stage-change-modal');
+        const stageChangeTitle = document.getElementById('stage-change-title');
+        const stageChangeDescription = document.getElementById('stage-change-description');
+        const stageChangeCloseBtn = document.getElementById('stage-change-close-btn');
+        const collapseCardsBtn = document.getElementById('collapse-cards-btn');
+        const expandCardsBtn = document.getElementById('expand-cards-btn');
+        const cardsColumn = document.getElementById('cards-column');
+        const miroColumn = document.getElementById('miro-column');
+        const resizeHandle = document.getElementById('resize-handle');
+
+        // --- Page Navigation ---
+        function showPage(index) {
+            currentPageIndex = index;
+            const pageId = pageSequence[index];
+
+            // Reset next button behavior to default
+            nextBtn.onclick = null;
+
+            Object.values(pages).forEach(p => p.classList.remove('active'));
+            if(pages[pageId]) {
+                pages[pageId].classList.add('active');
+            }
+            headerTitle.textContent = pageTitles[pageId] || '';
+            
+            backBtn.style.visibility = index === 0 ? 'hidden' : 'visible';
+            backBtn.disabled = false; // Ensure back button is always enabled when visible
+            
+            // Hide the main next button during the tutorial and discussion, as they have their own navigation.
+            nextBtn.style.visibility = (pageId === 'tutorial' || pageId === 'discussion') ? 'hidden' : 'visible';
+            
+            if (pageId === 'persona-selection') {
+                nextBtn.disabled = false; // Always allow proceeding from persona selection
+            } else if (pageId === 'activity') {
+                nextBtn.disabled = false;
+            } else if (pageId === 'rules') {
+                nextBtn.disabled = true; // Disable until viewer/coordinator is selected
+            } else {
+                nextBtn.disabled = index === pageSequence.length - 1;
+            }
+
+            if (pageId === 'groupSelection') initGroupSelection();
+            if (pageId === 'useCase') initUseCase();
+            if (pageId === 'tutorial') initTutorial();
+            if (pageId === 'rules') initViewerCoordinatorSelection();
+            if (pageId === 'demo') {
+                initDemoPage();
+                // Check if user skipped to demo to adjust the next button behavior
+                if (sessionStorage.getItem('skippedToDemo') === 'true') {
+                    // Remove the default event listener to prevent double execution
+                    nextBtn.removeEventListener('click', goNext);
+                    // When skipping to demo, next should go to group selection
+                    nextBtn.onclick = (e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        sessionStorage.removeItem('skippedToDemo'); // Clear the flag
+                        // Re-add the default event listener for future navigation
+                        nextBtn.addEventListener('click', goNext);
+                        nextBtn.onclick = null; // Clear the custom onclick
+                        showPage(pageSequence.indexOf('groupSelection'));
+                    };
+                }
+            }
+            if (pageId === 'persona-selection') initPersonaSelection();
+            if (pageId === 'activity') {
+                // Only start from step 0 if we haven't started the activity yet
+                if (currentActivityStep === -1) {
+                    runActivityStep(0);
+                } else {
+                    // Resume the current step without reloading Miro
+                    runActivityStep(currentActivityStep);
+                }
+            }
+            if (pageId === 'discussion') initDiscussion();
+        }
+
+        function goBack() {
+            const onActivityPage = pageSequence[currentPageIndex] === 'activity';
+            const onDiscussionPage = pageSequence[currentPageIndex] === 'discussion';
+            const onDemoPage = pageSequence[currentPageIndex] === 'demo';
+            
+            if (onActivityPage && currentActivityStep > 0) {
+                clearInterval(countdownInterval);
+                runActivityStep(currentActivityStep - 1);
+            } else if (onDemoPage && sessionStorage.getItem('skippedToDemo') === 'true') {
+                // If user skipped to demo, go back to tutorial instead of rules
+                showPage(pageSequence.indexOf('tutorial'));
+            } else if (onDiscussionPage) {
+                // When on discussion page, go back to activity page at the last step (Brainstorm Mitigations)
+                const activityIndex = pageSequence.indexOf('activity');
+                if (activityIndex !== -1) {
+                    // Set to the last activity step (Brainstorm Mitigations = step 3)
+                    currentActivityStep = activitySteps.length - 1;
+                    showPage(activityIndex);
+                }
+            } else if (currentPageIndex > 0) {
+                showPage(currentPageIndex - 1);
+            }
+        }
+
+        function goNext() {
+            const onActivityPage = pageSequence[currentPageIndex] === 'activity';
+            if (onActivityPage) {
+                clearInterval(countdownInterval);
+                runActivityStep(currentActivityStep + 1);
+            } else if (currentPageIndex < pageSequence.length - 1) {
+                if(pageSequence[currentPageIndex] === 'persona-selection') {
+                    // Create final list of personas, adding defaults if needed
+                    let finalPersonas = [...selectedPersonas];
+                    while (finalPersonas.length < 2) {
+                        finalPersonas.push({
+                            id: `default-${finalPersonas.length + 1}`,
+                            name: `Persona ${finalPersonas.length + 1}`,
+                            description: 'A default persona placeholder.',
+                            image: 'https://placehold.co/400x300/64748b/e2e8f0?text=Persona'
+                        });
+                    }
+                    // Overwrite the global state with the final list for the activity
+                    selectedPersonas = finalPersonas; 
+
+                    // Now create activity steps using the final personas list
+                    activitySteps = [
+                        { 
+                            title: `Empathy Map: ${selectedPersonas[0].name}`, 
+                            description: `<i class='text-gray-500 block mb-1'>${selectedPersonas[0].description}</i><span>Step into ${selectedPersonas[0].name}'s shoes. What do they see, hear, say, do, think, and feel?</span>`, 
+                            duration: 20 * 60, 
+                            color: 'text-indigo-600' 
+                        },
+                        { 
+                            title: `Empathy Map: ${selectedPersonas[1].name}`, 
+                            description: `<i class='text-gray-500 block mb-1'>${selectedPersonas[1].description}</i><span>Now, do the same for ${selectedPersonas[1].name}. Consider their unique perspective.</span>`, 
+                            duration: 20 * 60, 
+                            color: 'text-purple-600' 
+                        },
+                        { 
+                            title: 'Identify Risks & Benefits', 
+                            description: 'Based on both empathy maps, what are the potential risks and benefits of the AI companion?', 
+                            duration: 15 * 60, 
+                            color: 'text-orange-600' 
+                        },
+                        { 
+                            title: 'Brainstorm Mitigations', 
+                            description: 'For each risk you identified, brainstorm ways to mitigate or prevent it.', 
+                            duration: 20 * 60, 
+                            color: 'text-blue-600' 
+                        }
+                    ];
+                }
+                showPage(currentPageIndex + 1);
+            }
+        }
+
+        backBtn.addEventListener('click', goBack);
+        nextBtn.addEventListener('click', goNext);
+
+        // Skip to Demo button functionality
+        const introSkipToDemoBtn = document.getElementById('intro-skip-to-demo-btn');
+        if (introSkipToDemoBtn) {
+            introSkipToDemoBtn.addEventListener('click', () => {
+                // Set coordinator role by default for skip to demo
+                userRole = 'coordinator';
+                // Track that user came from skip button for proper back navigation
+                sessionStorage.setItem('skippedToDemo', 'true');
+                // Clear any previously selected group to force selection
+                selectedGroup = null;
+                // Skip directly to demo page
+                showPage(pageSequence.indexOf('demo'));
+            });
+        }
+
+        // --- Tutorial Logic ---
+        const tutorialSteps = [
+           { text: "Consider the following example. Our persona is <b>Zaman</b>, a 21-year-old student who uses autonomous cars (like Waymo) to meet friends because he does not have a license.", id: 'intro' },
+           { text: `<strong>1. Who might be most impacted?:</strong> First, identify the primary person or group. Who are we empathising with?<br><br><em>Example: In this case, our focus is squarely on <strong>Zaman</strong>. His goals, challenges, and feelings are what we want to understand in the context of using an autonomous car service.</em>`, id: 'impacted' },
+           { text: `<strong>2. SEE:</strong> What does Zaman see in his environment?<br><br><em>Example: He sees friends' social media posts from places he can't easily get to. He sees autonomous cars driving around town and watches review videos about them online.</em>`, id: 'see' },
+           { text: `<strong>3. SAY:</strong> What does Zaman say out loud?<br><br><em>Example: "Can someone pick me up?" or "I'll just grab a Waymo, it's easy." He might also say, "I wish I had my license already."</em>`, id: 'say' },
+           { text: `<strong>4. DO:</strong> What actions and behaviors does Zaman take?<br><br><em>Example: He frequently uses his phone to coordinate rides with friends or book a car through an app. He sometimes has to cancel plans if a ride isn't available.</em>`, id: 'do' },
+           { text: `<strong>5. HEAR:</strong> What does Zaman hear from others?<br><br><em>Example: He hears friends making plans. He hears news reports about the safety of autonomous cars. His parents might express worry about him using them.</em>`, id: 'hear' },
+           { text: `<strong>6. THINK & FEEL:</strong> What are his internal thoughts and emotions?<br><br><em>Example: He feels a mix of freedom and frustration. He's happy to be independent but feels anxious about the car arriving on time or potential glitches and vehicle crashes.</em>`, id: 'thinks-feels' },
+           { text: "By filling out the empathy map, your team will then consider AI-specific <strong>benefits</strong> and <strong>risks</strong> based on themes you identified in the Empathy Map.", id: 'summary' },
+           { text: "Finally, you will ideate on <strong>mitigations</strong> to the AI-specific risks that you identified in the previous step.", id: 'mitigation' }
+        ];
+        let currentTutorialStep = 0;
+
+        function initTutorial() {
+            const vizContainer = document.getElementById('tutorial-viz-container');
+            const textContainer = document.getElementById('tutorial-text-container').querySelector('p');
+            const stepIndicator = document.getElementById('tutorial-step-indicator');
+            const tutorialPrevBtn = document.getElementById('tutorial-prev-btn');
+            const tutorialNextBtn = document.getElementById('tutorial-next-btn');
+            
+            function updateTutorialView() {
+                textContainer.innerHTML = tutorialSteps[currentTutorialStep].text;
+                stepIndicator.textContent = `Step ${currentTutorialStep + 1} of ${tutorialSteps.length}`;
+                
+                const isLastStep = currentTutorialStep === tutorialSteps.length - 1;
+                tutorialNextBtn.textContent = isLastStep ? 'Continue' : 'Next Step';
+                tutorialPrevBtn.textContent = currentTutorialStep === 0 ? 'Back to Intro' : 'Previous';
+
+                const highlightedId = tutorialSteps[currentTutorialStep].id;
+
+                vizContainer.innerHTML = `
+                    <svg viewBox="0 0 400 400" class="w-full h-full">
+                        <path d="M0 350 L200 200 L400 50" stroke="#d1d5db" stroke-width="2" fill="none"/>
+                        <path d="M0 50 L400 350" stroke="#d1d5db" stroke-width="2" fill="none"/>
+                        <path d="M200 200 L400 200" stroke="#d1d5db" stroke-width="2" fill="none"/>
+                        <text x="200" y="25" text-anchor="middle" class="empathy-map-text" font-weight="600" font-size="14">Persona: Zaman, 21-year-old</text>
+                        <text x="200" y="45" text-anchor="middle" class="empathy-map-text" font-weight="600" font-size="14">Goal: Meet up with friends</text>
+                        <path d="M 200,130 C 250,130 280,160 280,210 S 250,290 200,290 S 120,260 120,210 S 150,130 200,130 Z" fill="#e5e7eb" stroke="#9ca3af" stroke-width="2"/>
+                        <g class="empathy-map-text ${highlightedId === 'thinks-feels' ? 'highlight' : ''}">
+                            <text x="200" y="200" text-anchor="middle" font-weight="bold">THINK</text>
+                            <text x="200" y="225" text-anchor="middle" font-weight="bold">& FEEL</text>
+                        </g>
+                        <text x="320" y="149" text-anchor="middle" class="empathy-map-text ${highlightedId === 'see' ? 'highlight' : ''}" font-weight="bold">SEE</text>
+                        <text x="80" y="149" text-anchor="middle" class="empathy-map-text ${highlightedId === 'hear' ? 'highlight' : ''}" font-weight="bold">HEAR</text>
+                        <text x="320" y="228" text-anchor="middle" class="empathy-map-text ${highlightedId === 'say' ? 'highlight' : ''}" font-weight="bold">SAY</text>
+                        <text x="200" y="312" text-anchor="middle" class="empathy-map-text ${highlightedId === 'do' ? 'highlight' : ''}" font-weight="bold">DO</text>
+                    </svg>
+                `;
+            }
+
+            tutorialPrevBtn.onclick = () => {
+                if (currentTutorialStep === 0) goBack();
+                else {
+                    currentTutorialStep--;
+                    updateTutorialView();
+                }
+            };
+            tutorialNextBtn.onclick = () => {
+                if (currentTutorialStep === tutorialSteps.length - 1) goNext();
+                else {
+                    currentTutorialStep++;
+                    updateTutorialView();
+                }
+            };
+            
+            currentTutorialStep = 0;
+            updateTutorialView();
+        }
+
+        // --- Persona Selection Logic ---
+        function initPersonaSelection() {
+            const grid = document.getElementById('persona-grid');
+            grid.innerHTML = '';
+            
+            // Create predefined persona cards
+            personas.forEach(persona => {
+                const card = document.createElement('div');
+                card.className = 'persona-card bg-white rounded-lg shadow-md p-4 cursor-pointer border-2 border-transparent';
+                card.dataset.personaId = persona.id;
+                card.innerHTML = `
+                    <img src="${persona.image}" alt="${persona.name}" class="rounded-md mb-4 w-full h-32 object-cover">
+                    <h3 class="text-xl font-bold text-gray-800">${persona.name}</h3>
+                    <p class="text-gray-600">${persona.description}</p>
+                `;
+                card.addEventListener('click', () => togglePersonaSelection(persona, card));
+                grid.appendChild(card);
+            });
+
+            // Set up custom persona inputs
+            setupCustomPersonaInputs();
+            updateSelectionStatus();
+        }
+
+        function setupCustomPersonaInputs() {
+            // Custom persona 1
+            const nameInput1 = document.getElementById('custom-name-1');
+            const descInput1 = document.getElementById('custom-desc-1');
+            const addBtn1 = document.getElementById('add-custom-1');
+            const card1 = document.getElementById('custom-persona-1');
+            const preview1 = document.getElementById('custom-preview-1');
+
+            function validateCustom1() {
+                const isValid = nameInput1.value.trim() && descInput1.value.trim();
+                addBtn1.disabled = !isValid;
+                
+                if (nameInput1.value.trim()) {
+                    preview1.textContent = nameInput1.value.trim();
+                } else {
+                    preview1.textContent = 'Enter name...';
+                }
+                
+                return isValid;
+            }
+
+            nameInput1.addEventListener('input', validateCustom1);
+            descInput1.addEventListener('input', validateCustom1);
+
+            card1.addEventListener('click', (e) => {
+                if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.tagName === 'BUTTON') {
+                    return;
+                }
+                nameInput1.focus();
+            });
+
+            addBtn1.addEventListener('click', (e) => {
+                e.stopPropagation();
+                if (validateCustom1()) {
+                    const customPersona = {
+                        id: 'custom-1',
+                        name: nameInput1.value.trim(),
+                        description: descInput1.value.trim(),
+                        image: 'https://placehold.co/400x300/c084fc/581c87?text=' + encodeURIComponent(nameInput1.value.trim()),
+                        isCustom: true
+                    };
+                    togglePersonaSelection(customPersona, card1);
+                }
+            });
+
+            // Custom persona 2
+            const nameInput2 = document.getElementById('custom-name-2');
+            const descInput2 = document.getElementById('custom-desc-2');
+            const addBtn2 = document.getElementById('add-custom-2');
+            const card2 = document.getElementById('custom-persona-2');
+            const preview2 = document.getElementById('custom-preview-2');
+
+            function validateCustom2() {
+                const isValid = nameInput2.value.trim() && descInput2.value.trim();
+                addBtn2.disabled = !isValid;
+                
+                if (nameInput2.value.trim()) {
+                    preview2.textContent = nameInput2.value.trim();
+                } else {
+                    preview2.textContent = 'Enter name...';
+                }
+                
+                return isValid;
+            }
+
+            nameInput2.addEventListener('input', validateCustom2);
+            descInput2.addEventListener('input', validateCustom2);
+
+            card2.addEventListener('click', (e) => {
+                if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.tagName === 'BUTTON') {
+                    return;
+                }
+                nameInput2.focus();
+            });
+
+            addBtn2.addEventListener('click', (e) => {
+                e.stopPropagation();
+                if (validateCustom2()) {
+                    const customPersona = {
+                        id: 'custom-2',
+                        name: nameInput2.value.trim(),
+                        description: descInput2.value.trim(),
+                        image: 'https://placehold.co/400x300/fbbf24/92400e?text=' + encodeURIComponent(nameInput2.value.trim()),
+                        isCustom: true
+                    };
+                    togglePersonaSelection(customPersona, card2);
+                }
+            });
+        }
+
+        function togglePersonaSelection(persona, cardElement) {
+            const index = selectedPersonas.findIndex(p => p.id === persona.id);
+            
+            if (index > -1) {
+                // Deselect persona
+                selectedPersonas.splice(index, 1);
+                cardElement.classList.remove('selected');
+                
+                if (persona.isCustom) {
+                    const personaNum = persona.id === 'custom-1' ? '1' : '2';
+                    const nameInput = document.getElementById(`custom-name-${personaNum}`);
+                    const descInput = document.getElementById(`custom-desc-${personaNum}`);
+                    const btn = document.getElementById(`add-custom-${personaNum}`);
+                    const preview = document.getElementById(`custom-preview-${personaNum}`);
+                    
+                    nameInput.value = '';
+                    descInput.value = '';
+                    nameInput.disabled = false;
+                    descInput.disabled = false;
+                    btn.disabled = true;
+                    btn.textContent = 'Create This Persona';
+                    preview.textContent = 'Enter name...';
+                }
+            } else {
+                if (selectedPersonas.length < 2) {
+                    // Select persona
+                    selectedPersonas.push(persona);
+                    cardElement.classList.add('selected');
+                    
+                    if (persona.isCustom) {
+                        const personaNum = persona.id === 'custom-1' ? '1' : '2';
+                        const btn = document.getElementById(`add-custom-${personaNum}`);
+                        const nameInput = document.getElementById(`custom-name-${personaNum}`);
+                        const descInput = document.getElementById(`custom-desc-${personaNum}`);
+                        
+                        btn.textContent = 'Selected ✓';
+                        btn.disabled = true;
+                        nameInput.disabled = true;
+                        descInput.disabled = true;
+                    }
+                }
+            }
+            
+            updateSelectionStatus();
+        }
+
+        function updateSelectionStatus() {
+            const status1 = document.getElementById('persona-1-status');
+            const status2 = document.getElementById('persona-2-status');
+            
+            status1.textContent = selectedPersonas[0] ? `Persona 1: ${selectedPersonas[0].name}` : 'Persona 1: Not selected';
+            status2.textContent = selectedPersonas[1] ? `Persona 2: ${selectedPersonas[1].name}` : 'Persona 2: Not selected';
+        }
+
+        // --- Group Selection Logic ---
+        function initGroupSelection() {
+            const groupButtons = document.querySelectorAll('.group-btn');
+            groupButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    groupButtons.forEach(btn => btn.classList.remove('selected'));
+                    this.classList.add('selected');
+                    selectedGroup = this.dataset.group;
+                    miroLoaded = false; // Reset Miro loading flag when group changes
+                    nextBtn.disabled = false;
+                });
+            });
+            
+            // Reset state
+            groupButtons.forEach(btn => btn.classList.remove('selected'));
+            selectedGroup = null;
+            nextBtn.disabled = true;
+        }
+
+        // --- Viewer/Coordinator Selection Logic ---
+        function initViewerCoordinatorSelection() {
+            const viewerBtn = document.getElementById('viewer-btn');
+            const coordinatorBtn = document.getElementById('coordinator-btn');
+            
+            if (viewerBtn) {
+                viewerBtn.addEventListener('click', function() {
+                    userRole = 'viewer';
+                    // Continue to next page
+                    if (currentPageIndex < pageSequence.length - 1) {
+                        showPage(currentPageIndex + 1);
+                    }
+                });
+            }
+            
+            if (coordinatorBtn) {
+                coordinatorBtn.addEventListener('click', function() {
+                    userRole = 'coordinator';
+                    // Continue to next page
+                    if (currentPageIndex < pageSequence.length - 1) {
+                        showPage(currentPageIndex + 1);
+                    }
+                });
+            }
+        }
+
+        // --- Use Case Logic ---
+        function initUseCase() {
+            const useCaseTitle = document.getElementById('usecase-title');
+            const useCaseDescription = document.getElementById('usecase-description');
+            const useCaseImage = document.getElementById('usecase-image');
+
+            const useCases = {
+                '3': {
+                    title: 'The AI Use Case: Salieri the Chatbot Companion',
+                    description: 'An AI-powered chatbot designed to provide emotional support and companionship through conversation. Users can share their thoughts, feelings, and daily experiences with this virtual companion.',
+                    image: 'chatbot_companion_AI_use_card.png',
+                    alt: 'Salieri the Chatbot Companion'
+                },
+                '6': {
+                    title: 'The AI Use Case: Salieri the Chatbot Companion',
+                    description: 'An AI-powered chatbot designed to provide emotional support and companionship through conversation. Users can share their thoughts, feelings, and daily experiences with this virtual companion.',
+                    image: 'chatbot_companion_AI_use_card.png',
+                    alt: 'Salieri the Chatbot Companion'
+                },
+                '7': {
+                    title: 'The AI Use Case: Salieri the Chatbot Companion',
+                    description: 'An AI-powered chatbot designed to provide emotional support and companionship through conversation. Users can share their thoughts, feelings, and daily experiences with this virtual companion.',
+                    image: 'chatbot_companion_AI_use_card.png',
+                    alt: 'Salieri the Chatbot Companion'
+                },
+                '11': {
+                    title: 'The AI Use Case: Medical AI Assistant',
+                    description: 'An AI-powered medical assistant designed to help healthcare professionals with diagnosis, treatment recommendations, and patient care decisions.',
+                    image: 'medical_AI_use_card.jpg',
+                    alt: 'Medical AI Assistant'
+                }
+            };
+
+            if (selectedGroup && useCases[selectedGroup]) {
+                const useCase = useCases[selectedGroup];
+                useCaseTitle.textContent = useCase.title;
+                useCaseDescription.textContent = useCase.description;
+                useCaseImage.src = useCase.image;
+                useCaseImage.alt = useCase.alt;
+            } else {
+                // Default to chatbot if no group selected
+                const useCase = useCases['3'];
+                useCaseTitle.textContent = useCase.title;
+                useCaseDescription.textContent = useCase.description;
+                useCaseImage.src = useCase.image;
+                useCaseImage.alt = useCase.alt;
+            }
+        }
+
+        // --- Demo Logic ---
+        function initDemoPage() {
+            const overlay = document.getElementById('demo-intro-overlay');
+            const demoHeader = document.getElementById('demo-header');
+            const demoMainContent = document.getElementById('demo-main-content');
+            const demoMiroIframe = document.querySelector('#demo-miro-column iframe');
+            
+            // Use role-specific demo URL
+            const role = userRole || 'coordinator'; // Default to coordinator if no role selected
+            demoMiroIframe.src = MIRO_URLS.demo[role];
+            
+            overlay.classList.remove('hidden');
+            overlay.classList.add('flex');
+            overlay.style.opacity = '1';
+
+            overlay.innerHTML = `
+                <div class="text-center mb-8">
+                    <h2 class="text-3xl font-bold text-white mb-2">Demo and Miro Help</h2>
+                    <p class="text-lg text-gray-300">Take some time to explore the Miro interface and practice before the main activity.</p>
+                    <p class="text-md text-gray-400 mt-4">You can use the Risk and Mitigation cards for inspiration while exploring.</p>
+                </div>
+                <div id="demo-cards-animation-container" class="relative w-64 h-96"></div>
+                <button id="start-demo-btn" class="mt-8 bg-white text-indigo-600 font-bold py-3 px-8 rounded-lg text-lg hover:bg-gray-200 transition-colors shadow-lg">
+                    Explore Miro
+                </button>
+            `;
+            
+            const animationContainer = document.getElementById('demo-cards-animation-container');
+            const introTransforms = ['rotate-[-15deg] translate-x-[-60px]', 'rotate-[-9deg] translate-x-[-30px]', 'rotate-[-3deg]', 'rotate-[3deg]', 'rotate-[9deg] translate-x-[30px]', 'rotate-[15deg] translate-x-[60px]'];
+            riskCardData.forEach((card, index) => {
+                const cardEl = document.createElement('div');
+                cardEl.className = 'risk-card-flyer absolute top-0 left-0 w-full h-full';
+                cardEl.style.transform = introTransforms[index];
+                cardEl.innerHTML = createCardHTML(card);
+                animationContainer.appendChild(cardEl);
+            });
+
+            document.getElementById('start-demo-btn').onclick = () => {
+                overlay.style.opacity = '0';
+                setTimeout(() => {
+                    overlay.classList.add('hidden');
+                    demoHeader.classList.remove('opacity-0');
+                    demoMainContent.classList.remove('opacity-0');
+                    initDemoCards();
+                }, 500);
+            };
+        }
+
+        function initDemoCards() {
+            const demoShowRisksBtn = document.getElementById('demo-show-risks-btn');
+            const demoShowMitigationsBtn = document.getElementById('demo-show-mitigations-btn');
+            const demoCardsContainer = document.getElementById('demo-cards-container');
+            const demoExpandBtn = document.getElementById('demo-expand-cards-btn');
+            const demoCollapseBtn = document.getElementById('demo-collapse-cards-btn');
+            const demoContinueBtn = document.getElementById('demo-continue-btn');
+            
+            // Set up card toggle functionality
+            demoShowRisksBtn.addEventListener('click', () => {
+                populateCards(demoCardsContainer, riskCardData);
+            });
+
+            demoShowMitigationsBtn.addEventListener('click', () => {
+                populateCards(demoCardsContainer, mitigationCardData);
+            });
+
+            // Set up expand/collapse functionality
+            demoExpandBtn.addEventListener('click', () => {
+                document.getElementById('demo-left-column').classList.remove('hidden');
+                document.getElementById('demo-left-column').classList.add('flex');
+                demoExpandBtn.classList.add('hidden');
+                demoCollapseBtn.classList.remove('hidden');
+            });
+
+            demoCollapseBtn.addEventListener('click', () => {
+                document.getElementById('demo-left-column').classList.add('hidden');
+                document.getElementById('demo-left-column').classList.remove('flex');
+                demoCollapseBtn.classList.add('hidden');
+                demoExpandBtn.classList.remove('hidden');
+            });
+
+            // Continue button functionality
+            if (demoContinueBtn) {
+                demoContinueBtn.addEventListener('click', () => {
+                    goNext();
+                });
+            }
+
+            // Start with risks shown
+            populateCards(demoCardsContainer, riskCardData);
+        }
+
+        // --- Discussion Logic ---
+        function initDiscussion() {
+            // Set up discussion continue button
+            const discussionContinueBtn = document.getElementById('discussion-continue-btn');
+            if (discussionContinueBtn) {
+                discussionContinueBtn.addEventListener('click', () => {
+                    window.open('https://forms.office.com/e/hCc2c58wLQ', '_blank');
+                });
+            }
+        }
+        
+        // --- Idea Card Data & Functions ---
+        const riskCardData = [
+             { title: 'Unfair Treatment', description: 'What is the consequence if the system is biased?<br>What happens if unbalanced training data causes the AI to perform differently for different people?', example: 'For example, a voice assistant might not understand users with a strong regional accent, making the service hard to use for them.', color: 'blue' },
+             { title: 'Data Privacy', description: 'What is the consequence if there is a privacy issue?<br>What could happen when users enter personal information into the system?', example: "For example, an AI analysing shopping habits could guess a user's secret medical condition and show them targeted ads.", color: 'teal' },
+             { title: 'False Information', description: 'What is the consequence if the system produces an invalid output?<br>What could happen if the AI hallucinates and provides incorrect or nonsensical information?', example: 'For example, a lawyer used an AI for research that invented several fake legal cases, which were then submitted to a real court.', color: 'purple' },
+             { title: 'Malicious Use', description: 'What is the consequence if there is a security issue?<br>How could the system be used for harmful purposes?', example: 'For example, an AI designed for creative writing could be used to generate large volumes of fake news articles or propaganda.', color: 'amber' },
+             { title: 'Unhealthy Use', description: "What is the consequence of unhealthy use?<br>How could long-term use of the AI negatively affect a person's well-being or habits?", example: "For example, a productivity AI could create unrealistic expectations of efficiency, leading to employee burnout.", color: 'rose' },
+             { title: 'Societal Harm', description: 'What is the consequence if the AI harms society?<br>How could our system disrupt social structures, jobs, or the environment?', example: 'For example, the massive amount of electricity needed to train a powerful AI model could contribute to climate change.', color: 'indigo' }
+        ];
+        
+        const mitigationCardData = [
+             { title: 'Fairness Testing & Audits', description: 'How can we regularly test the model for bias? What metrics should we use? Who should be involved in the audit process?', color: 'blue' },
+             { title: 'Data Minimisation & Anonymisation', description: 'What is the absolute minimum data we need to collect? How can we anonymise or de-identify user data to protect privacy?', color: 'teal' },
+             { title: 'Fact-Checking & Source Transparency', description: 'How can we verify the information the AI provides? Can we show users the sources of the information?', color: 'purple' },
+             { title: 'Security Safeguards & Access Controls', description: 'How can we prevent unauthorised access? What are the potential ways the system could be abused, and how do we block them?', color: 'amber' },
+             { title: 'Usage Limits & Well-being Nudges', description: 'Should we limit how much time a user can spend with the AI? Can we design features that encourage users to connect with real people?', color: 'rose' },
+             { title: 'Ethical Review & Impact Assessment', description: 'Who should review the potential societal impact before launch? How can we measure and monitor for unintended negative impacts?', color: 'indigo' }
+        ];
+
+        function createCardHTML(card) {
+            const colorClasses = { blue: 'border-blue-500', teal: 'border-teal-500', purple: 'border-purple-500', amber: 'border-amber-500', rose: 'border-rose-500', indigo: 'border-indigo-500' };
+            const bgClasses = { blue: 'bg-blue-100 text-blue-600', teal: 'bg-teal-100 text-teal-600', purple: 'bg-purple-100 text-purple-600', amber: 'bg-amber-100 text-amber-600', rose: 'bg-rose-100 text-rose-600', indigo: 'bg-indigo-100 text-indigo-600' };
+            const icons = {
+                blue: `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />`,
+                teal: `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />`,
+                purple: `<path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />`,
+                amber: `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" />`,
+                rose: `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z" />`,
+                indigo: `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 8h6m-5 4h4m5 4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2z" />`
+            };
+            const exampleHTML = card.example ? `<p class="text-xs italic text-slate-500 mt-2">${card.example}</p>` : '';
+            return `
+                <div class="bg-white border-l-4 ${colorClasses[card.color]} rounded-lg shadow-lg p-4 w-full h-full flex flex-col transition-transform transform hover:-translate-y-1 hover:shadow-xl">
+                    <div class="flex items-center mb-3">
+                        <div class="p-2 rounded-full ${bgClasses[card.color]}">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">${icons[card.color]}</svg>
+                        </div>
+                        <h2 class="text-md font-bold text-slate-800 ml-2">${card.title}</h2>
+                    </div>
+                    <div class="text-slate-600 text-sm leading-relaxed space-y-2 flex-grow">
+                        <p>${card.description}</p>
+                        ${exampleHTML}
+                    </div>
+                </div>`;
+        }
+
+        function populateCards(container, cardData) {
+            container.innerHTML = '';
+            cardData.forEach((card, index) => {
+                const cardWrapper = document.createElement('div');
+                cardWrapper.className = 'card-wrapper transition-all duration-500 transform-gpu opacity-0 translate-y-5';
+                cardWrapper.style.transitionDelay = `${index * 50}ms`;
+                cardWrapper.innerHTML = createCardHTML(card);
+                container.appendChild(cardWrapper);
+                setTimeout(() => cardWrapper.classList.remove('opacity-0', 'translate-y-5'), 50);
+            });
+        }
+
+        // --- Activity Logic ---
+        function updateColumnLayout() {
+            if (isCardsCollapsed) {
+                // State: Hide cards, miro is full-width
+                cardsColumn.classList.add('hidden');
+                cardsColumn.classList.remove('flex');
+                resizeHandle.classList.add('hidden');
+                expandCardsBtn.classList.remove('hidden');
+                collapseCardsBtn.classList.add('hidden');
+                // Clear any resize-related inline styles when collapsed
+                cardsColumn.style.width = '';
+                cardsColumn.style.flexBasis = '';
+                cardsColumn.style.flexShrink = '';
+                cardsColumn.style.flexGrow = '';
+                miroColumn.style.width = '';
+                miroColumn.style.flexBasis = '';
+                miroColumn.style.flexShrink = '';
+                miroColumn.style.flexGrow = '';
+            } else {
+                // State: Show cards and miro
+                cardsColumn.classList.remove('hidden');
+                cardsColumn.classList.add('flex');
+                resizeHandle.classList.remove('hidden');
+                collapseCardsBtn.classList.remove('hidden');
+                expandCardsBtn.classList.add('hidden');
+                // Only set default width if no width is set (first open)
+                if (!cardsColumn.style.width || cardsColumn.style.width === '') {
+                    cardsColumn.style.width = '400px';
+                    cardsColumn.style.flexBasis = '400px';
+                    cardsColumn.style.flexShrink = '0';
+                    cardsColumn.style.flexGrow = '0';
+                }
+                // Always clear miroColumn inline styles so it can flex
+                miroColumn.style.width = '';
+                miroColumn.style.flexBasis = '';
+                miroColumn.style.flexShrink = '';
+                miroColumn.style.flexGrow = '';
+            }
+        }
+
+        collapseCardsBtn.addEventListener('click', () => {
+            isCardsCollapsed = true;
+            updateColumnLayout();
+        });
+        
+        expandCardsBtn.addEventListener('click', () => {
+            isCardsCollapsed = false;
+            updateColumnLayout();
+        });
+
+        document.getElementById('show-risks-btn').addEventListener('click', () => {
+            document.getElementById('cards-column-title').textContent = 'Risk Cards';
+            document.getElementById('cards-column-instruction').textContent = 'Use these cards for context and inspiration.';
+            populateCards(document.getElementById('cards-container'), riskCardData);
+        });
+
+        document.getElementById('show-mitigations-btn').addEventListener('click', () => {
+            document.getElementById('cards-column-title').textContent = 'Mitigation Idea Cards';
+            document.getElementById('cards-column-instruction').textContent = 'Use these cards to brainstorm solutions and safeguards.';
+            populateCards(document.getElementById('cards-container'), mitigationCardData);
+        });
+
+        function runActivityStep(stepIndex) {
+            currentActivityStep = stepIndex;
+            
+            if (stepIndex >= activitySteps.length) {
+                // Go to discussion page instead of external redirect
+                showPage(pageSequence.indexOf('discussion'));
+                return;
+            }
+            
+            clearInterval(countdownInterval);
+            const step = activitySteps[stepIndex];
+
+            // Set the correct Miro board URL for the activity
+            const miroIframe = document.querySelector('#miro-column iframe[title="Miro Board"]');
+            if (miroIframe) {
+                // Use group-specific board based on workshop number and user role
+                const role = userRole || 'coordinator'; // Default to coordinator if no role selected
+                const groupBoard = MIRO_URLS.mainBoards[selectedGroup];
+                
+                // Always update the Miro URL to ensure it matches the current group selection
+                if (groupBoard && groupBoard[role]) {
+                    miroIframe.src = groupBoard[role];
+                } else {
+                    // Fallback to workshop 3 coordinator if selection not found
+                    miroIframe.src = MIRO_URLS.mainBoards['3'][role];
+                }
+            }
+
+            // Set initial card view for the step
+            if (step.title.includes('Mitigations')) {
+                document.getElementById('show-mitigations-btn').click();
+            } else {
+                document.getElementById('show-risks-btn').click();
+            }
+            updateColumnLayout();
+
+            // Update header display
+            document.getElementById('activity-step-title').innerHTML = step.title;
+            document.getElementById('activity-step-description').innerHTML = step.description;
+            document.getElementById('activity-step-title').className = `text-xl font-semibold ${step.color}`;
+
+            // Start timer (only for coordinators)
+            const timerEl = document.getElementById('activity-timer');
+            if (userRole === 'viewer') {
+                // Hide timer for viewers
+                timerEl.textContent = '';
+            } else {
+                // Show timer for coordinators
+                let timeLeft = step.duration;
+                const updateTimer = () => {
+                    const minutes = Math.floor(timeLeft / 60);
+                    const seconds = timeLeft % 60;
+                    timerEl.textContent = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+                    if (timeLeft <= 15 && timeLeft > 0) {
+                        timerEl.classList.add('text-red-500');
+                    } else {
+                        timerEl.classList.remove('text-red-500');
+                    }
+                };
+                updateTimer();
+
+                countdownInterval = setInterval(() => {
+                    if (timeLeft <= 0) {
+                        //runActivityStep(currentActivityStep + 1); //Dont do anything for now, dont autoprogress.
+                    }
+                    else{
+                        timeLeft--;
+                        updateTimer();
+                    }
+                }, 1000);
+            }
+        }
+        
+        stageChangeCloseBtn.addEventListener('click', () => {
+            stageChangeModal.classList.add('hidden');
+            stageChangeModal.classList.remove('flex');
+            runActivityStep(currentActivityStep + 1);
+        });
+
+        // --- Resize Handle Logic ---
+        let isResizing = false;
+        let startX = 0;
+        let startLeftWidth = 0;
+        
+        resizeHandle.addEventListener('mousedown', (e) => {
+            isResizing = true;
+            startX = e.clientX;
+            startLeftWidth = cardsColumn.offsetWidth;
+            resizeHandle.classList.add('dragging');
+            document.body.style.cursor = 'col-resize';
+            document.body.style.userSelect = 'none';
+            
+            // Add a temporary overlay to prevent iframe from capturing events
+            const overlay = document.createElement('div');
+            overlay.id = 'resize-overlay';
+            overlay.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                z-index: 9999;
+                cursor: col-resize;
+                background: transparent;
+            `;
+            document.body.appendChild(overlay);
+            
+            e.preventDefault();
+            e.stopPropagation();
+        });
+        
+        document.addEventListener('mousemove', (e) => {
+            if (!isResizing) return;
+            
+            // Prevent default behaviors during drag
+            e.preventDefault();
+            e.stopPropagation();
+            
+            const deltaX = e.clientX - startX;
+            const newLeftWidth = startLeftWidth + deltaX;
+            const mainContent = document.getElementById('activity-main-content');
+            const maxWidth = mainContent.offsetWidth * 0.6; // Max 60% of container
+            const minWidth = 300; // Min 300px
+            
+            const constrainedWidth = Math.max(minWidth, Math.min(maxWidth, newLeftWidth));
+            
+            // Update the left column width
+            cardsColumn.style.width = `${constrainedWidth}px`;
+            cardsColumn.style.flexBasis = `${constrainedWidth}px`;
+            cardsColumn.style.flexShrink = '0';
+            cardsColumn.style.flexGrow = '0';
+            
+            // Update the miro column to take remaining space
+            const resizeHandleWidth = resizeHandle.offsetWidth;
+            const remainingWidth = mainContent.offsetWidth - constrainedWidth - resizeHandleWidth - 32; // 32px for gaps
+            miroColumn.style.width = `${remainingWidth}px`;
+            miroColumn.style.flexBasis = `${remainingWidth}px`;
+            miroColumn.style.flexShrink = '0';
+            miroColumn.style.flexGrow = '0';
+            // Always show the resize handle after resizing
+            resizeHandle.classList.remove('hidden');
+        });
+        
+        document.addEventListener('mouseup', (e) => {
+            if (isResizing) {
+                isResizing = false;
+                resizeHandle.classList.remove('dragging');
+                document.body.style.cursor = '';
+                document.body.style.userSelect = '';
+                
+                // Remove the overlay
+                const overlay = document.getElementById('resize-overlay');
+                if (overlay) {
+                    overlay.remove();
+                }
+                
+                // Prevent any default behaviors
+                e.preventDefault();
+                e.stopPropagation();
+            }
+        });
+
+        // Handle mouse leave events to prevent losing drag state when cursor moves fast
+        document.addEventListener('mouseleave', (e) => {
+            // Only reset if mouse actually leaves the document entirely
+            if (isResizing && !e.relatedTarget) {
+                isResizing = false;
+                resizeHandle.classList.remove('dragging');
+                document.body.style.cursor = '';
+                document.body.style.userSelect = '';
+                
+                // Remove the overlay
+                const overlay = document.getElementById('resize-overlay');
+                if (overlay) {
+                    overlay.remove();
+                }
+            }
+        });
+
+        // Handle case where iframe might capture mouse events
+        const miroIframe = document.querySelector('#miro-column iframe');
+        if (miroIframe) {
+            miroIframe.addEventListener('mouseenter', () => {
+                if (isResizing) {
+                    // Stop resize if mouse enters iframe during drag
+                    isResizing = false;
+                    resizeHandle.classList.remove('dragging');
+                    document.body.style.cursor = '';
+                    document.body.style.userSelect = '';
+                }
+            });
+        }
+
+        // --- Initial Load ---
+        showPage(0);
+    });
+    </script>
+</body>
+</html>

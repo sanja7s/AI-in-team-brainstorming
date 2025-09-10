@@ -1,0 +1,1387 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Futures Wheel Workshop</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body, html {
+            height: 100%;
+            overflow: hidden;
+            font-family: 'Inter', sans-serif;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        main {
+            position: relative;
+        }
+        .page {
+            position: absolute;
+            inset: 0;
+            padding: 2rem; /* 32px */
+            display: none;
+            align-items: center;
+            justify-content: center;
+        }
+        .page.active {
+            display: flex;
+        }
+        .page#page-wheel {
+            align-items: stretch;
+            justify-content: flex-start;
+            padding: 0;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fadeIn {
+            animation: fadeIn 0.6s ease-in-out forwards;
+        }
+        .miro-container {
+            height: 100%;
+            width: 100%;
+        }
+        .card-wrapper {
+            display: flex; /* Ensures child takes full height */
+        }
+        .tutorial-arrow {
+            stroke: #4b5563; /* gray-600 */
+            stroke-width: 3;
+            marker-end: url(#arrowhead);
+        }
+        .risk-card-flyer {
+            transition: all 0.7s ease-in-out;
+        }
+        .aspect-square {
+            aspect-ratio: 1 / 1;
+        }
+        .resize-handle {
+            cursor: col-resize;
+            background: linear-gradient(90deg, transparent 0%, #d1d5db 45%, #9ca3af 50%, #d1d5db 55%, transparent 100%);
+            transition: background-color 0.2s ease;
+        }
+        .resize-handle:hover {
+            background: linear-gradient(90deg, transparent 0%, #9ca3af 45%, #6b7280 50%, #9ca3af 55%, transparent 100%);
+        }
+        .resize-handle.dragging {
+            background: linear-gradient(90deg, transparent 0%, #6366f1 45%, #4f46e5 50%, #6366f1 55%, transparent 100%);
+        }
+    </style>
+</head>
+<body class="bg-gray-100">
+
+    <div id="app-container" class="h-screen flex flex-col">
+        <!-- Header -->
+        <header id="main-header" class="bg-white shadow-md p-3 h-[60px] flex items-center justify-between sticky top-0 z-40 w-full flex-shrink-0">
+            <div class="w-28">
+                <button id="back-btn" class="flex items-center gap-2 text-gray-700 hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed transition-colors rounded-lg py-2 px-3 font-bold text-base">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd" /></svg>
+                    Back
+                </button>
+            </div>
+            <h1 id="header-title" class="text-lg md:text-xl font-bold text-gray-800 text-center"></h1>
+            <div class="w-28">
+                <button id="next-btn" class="flex items-center gap-2 text-white bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors rounded-lg py-2 px-3 font-bold text-base">
+                    Next
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" /></svg>
+                </button>
+            </div>
+        </header>
+
+        <!-- Main Content Area -->
+        <main class="flex-grow overflow-hidden">
+            
+            <!-- Page 0: Introduction -->
+            <div id="page-intro" class="page active">
+                <div class="bg-white p-12 rounded-2xl shadow-2xl max-w-4xl w-full text-center border border-gray-200 animate-fadeIn">
+                    <h1 class="text-4xl font-bold text-gray-800 mb-6">Welcome to the Futures Wheel Workshop</h1>
+                    <p class="text-xl text-gray-600 mb-8 leading-relaxed">A strategic brainstorming session to explore the ripple effects of AI applications.</p>
+                    <p class="text-lg text-red-600 font-bold">Note: This experience is not supported on Safari. Please use Google Chrome or Mozilla Firefox.</p>
+                    <p class="text-md text-gray-500 mb-6">Click "Next" to begin.</p>
+                    <div class="flex justify-center gap-4">
+                        <button id="intro-questionnaire-btn" class="bg-gray-600 text-white hover:bg-gray-700 transition-colors rounded-lg py-2 px-6 font-medium text-base">Go to Questionnaire</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Page 1: Our Plan -->
+            <div id="page-plan" class="page">
+                <div class="bg-white p-12 rounded-2xl shadow-2xl max-w-4xl w-full text-left border border-gray-200 animate-fadeIn">
+                    <h1 class="text-4xl font-bold text-gray-800 mb-6">Futures Wheel Workshop</h1>
+                    <p class="text-lg text-gray-600 mb-8 leading-relaxed">
+                        <strong>Introduction and warm-up task (10 min):</strong> We will start with team introductions and a quick warm-up exercise to get everyone thinking about AI impacts.
+                        <br><br><strong>Brief tutorial (5 min):</strong> We will show you how to build a Futures Wheel step by step.
+                        <br><br><strong>Build the wheel (45 min):</strong> Working in teams, you will brainstorm positive and negative impacts of an AI use across three rings of consequences.
+                        <br><br><strong>Analyse and ideate (35 min):</strong> Your team will then identify key benefits, risks, and mitigations for this AI use from your completed wheel.
+                        <br><br><strong>Workshop conclusion (5 min):</strong> We will wrap up with key takeaways and reflections on the process.
+                        <br><br><strong>Complete Post-study Questionnaire (10 min):</strong> Finally, you will each complete a post-study questionnaire on your experience with this workshop and for identifying AI benefits, risks and mitigations.
+                    </p>
+                    <p class="text-md text-gray-500 mt-6">Click "Next" to continue.</p>
+                </div>
+            </div>
+
+            <!-- Page 2: Icebreaker Task -->
+            <div id="page-icebreaker" class="page">
+                <div class="bg-white p-8 rounded-2xl shadow-2xl max-w-6xl w-full border border-gray-200 animate-fadeIn">
+                    <h1 class="text-4xl font-bold text-gray-800 mb-6 text-center">Icebreaker Task</h1>
+                    <div class="flex flex-col lg:flex-row gap-8 items-start">
+                        <!-- Left side: Instructions -->
+                        <div class="w-full lg:w-1/2">
+                            <h2 class="text-2xl font-semibold text-gray-800 mb-4">POLAK TASK (ICEBREAKER):</h2>
+                            <p class="text-lg text-gray-600 mb-6 leading-relaxed">
+                                Before we dive into the Futures Wheel activity, let's start with a quick icebreaker to get everyone thinking about AI and our ability to influence its future.
+                            </p>
+                            <div class="bg-gray-50 p-6 rounded-lg mb-6">
+                                <p class="text-lg text-gray-700 mb-4">Consider the following two dimensions in the context of <strong>the future of AI</strong>:</p>
+                                <ul class="text-lg text-gray-700 space-y-2 ml-4">
+                                    <li><strong>Y-axis:</strong> Optimistic vs. Pessimistic about AI's impact</li>
+                                    <li><strong>X-axis:</strong> Cannot make a difference vs. Can make a difference in shaping AI's future</li>
+                                </ul>
+                            </div>
+                            <p class="text-lg text-gray-600 mb-4">
+                                Think about where you would place yourself on these two axes and be ready to share your position with the group.
+                            </p>
+                        </div>
+                        
+                        <!-- Right side: Quadrant Plot -->
+                        <div class="w-full lg:w-1/2 flex justify-center">
+                            <div class="relative w-80 h-80 bg-white border-2 border-gray-300 rounded-lg shadow-sm">
+                                <!-- Axes -->
+                                <div class="absolute left-1/2 top-0 w-px h-full bg-gray-400"></div>
+                                <div class="absolute top-1/2 left-0 w-full h-px bg-gray-400"></div>
+                                
+                                <!-- Quadrant Labels -->
+                                <div class="absolute top-6 left-6 text-center">
+                                    <div class="text-sm font-semibold text-green-600">Optimistic</div>
+                                    <div class="text-xs text-gray-500 mt-1">Cannot influence</div>
+                                </div>
+                                
+                                <div class="absolute top-6 right-6 text-center">
+                                    <div class="text-sm font-semibold text-green-600">Optimistic</div>
+                                    <div class="text-xs text-gray-500 mt-1">Can influence</div>
+                                </div>
+                                
+                                <div class="absolute bottom-6 left-6 text-center">
+                                    <div class="text-sm font-semibold text-red-600">Pessimistic</div>
+                                    <div class="text-xs text-gray-500 mt-1">Cannot influence</div>
+                                </div>
+                                
+                                <div class="absolute bottom-6 right-6 text-center">
+                                    <div class="text-sm font-semibold text-red-600">Pessimistic</div>
+                                    <div class="text-xs text-gray-500 mt-1">Can influence</div>
+                                </div>
+                                
+                                <!-- Axis Labels -->
+                                <div class="absolute -top-8 left-1/2 transform -translate-x-1/2 text-sm font-medium text-gray-600">
+                                    Optimistic
+                                </div>
+                                <div class="absolute -bottom-8 left-1/2 transform -translate-x-1/2 text-sm font-medium text-gray-600">
+                                    Pessimistic
+                                </div>
+                                <div class="absolute top-1/2 -left-16 transform -translate-y-1/2 -rotate-90 text-sm font-medium text-gray-600">
+                                    Cannot influence
+                                </div>
+                                <div class="absolute top-1/2 -right-16 transform -translate-y-1/2 rotate-90 text-sm font-medium text-gray-600">
+                                    Can influence
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <p class="text-md text-gray-500 mt-6 text-center">Click "Next" to continue to the tutorial.</p>
+                </div>
+            </div>
+
+            <!-- Page 4: Group Selection -->
+            <div id="page-groupSelection" class="page">
+                <div class="bg-white p-12 rounded-2xl shadow-2xl max-w-4xl w-full text-center border border-gray-200 animate-fadeIn">
+                    <h1 class="text-4xl font-bold text-gray-800 mb-6">Select Your Workshop</h1>
+                    <p class="text-lg text-gray-600 mb-8 leading-relaxed">
+                        Please select your assigned workshop by clicking one of the buttons below.
+                    </p>
+                    <div class="flex justify-center gap-8 mb-8">
+                        <button id="group-2-btn" class="group-btn bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg text-lg transition-colors shadow-lg transform hover:scale-105">
+                            Workshop 2
+                        </button>
+                        <button id="group-4-btn" class="group-btn bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-6 rounded-lg text-lg transition-colors shadow-lg transform hover:scale-105">
+                            Workshop 4
+                        </button>
+                        <button id="group-9-btn" class="group-btn bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 px-6 rounded-lg text-lg transition-colors shadow-lg transform hover:scale-105">
+                            Workshop 9
+                        </button>
+                        <button id="group-12-btn" class="group-btn bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-6 rounded-lg text-lg transition-colors shadow-lg transform hover:scale-105">
+                            Workshop 10
+                        </button>
+                    </div>
+                    <p class="text-md text-gray-500">After selecting your workshop, you'll see your AI use case.</p>
+                </div>
+            </div>
+
+            <!-- Page 5: AI Use Case -->
+            <div id="page-useCase" class="page">
+                <div class="bg-white p-12 rounded-2xl shadow-2xl max-w-4xl w-full text-center border border-gray-200 animate-fadeIn">
+                    <h1 id="usecase-title" class="text-3xl font-bold text-gray-800 mb-6">The AI Use Case</h1>
+                    <img id="usecase-image" src="" alt="AI Use Case" class="rounded-lg shadow-md mb-8 w-full object-cover border border-gray-200" onerror="this.onerror=null;this.src='https://placehold.co/800x450/e2e8f0/64748b?text=Image+not+available';">
+                    <p class="text-lg text-gray-600 mb-4">We will use this AI use case for our Futures Wheel exercise.</p>
+                    <p class="text-md text-gray-500">Click "Next" in the header to learn how the Futures Wheel works.</p>
+                </div>
+            </div>
+
+            <!-- Page 6: Tutorial -->
+            <div id="page-tutorial" class="page">
+                <div class="bg-white p-8 rounded-2xl shadow-2xl w-full max-w-7xl border border-gray-200 animate-fadeIn flex flex-col lg:flex-row gap-8">
+                    <div id="tutorial-viz-parent" class="w-full lg:w-3/5 bg-gray-50 rounded-lg p-4 relative flex items-center justify-center overflow-hidden">
+                        <div id="tutorial-viz-container" class="w-full h-full relative aspect-square max-w-[700px] max-h-[700px]">
+                                 <!-- Visualisation content will be injected by JS -->
+                        </div>
+                    </div>
+                    <div class="w-full lg:w-2/5 flex flex-col justify-center">
+                        <h2 class="text-3xl font-bold text-gray-800 mb-4">Central Topic</h2>
+                        <div id="tutorial-text-container" class="bg-gray-100 p-4 rounded-lg min-h-[200px] flex items-center mb-6">
+                            <p class="text-lg text-gray-700"></p>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <button id="tutorial-prev-btn" class="bg-gray-300 text-gray-700 font-bold py-2 px-4 rounded-lg hover:bg-gray-400 disabled:opacity-50"></button>
+                            <div id="tutorial-step-indicator" class="text-sm text-gray-500"></div>
+                            <button id="tutorial-next-btn" class="bg-indigo-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-indigo-700 disabled:opacity-50"></button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Page 7: Rules -->
+            <div id="page-rules" class="page">
+                <div class="bg-white p-12 rounded-2xl shadow-2xl max-w-3xl w-full text-center border border-gray-200 animate-fadeIn">
+                    <h1 class="text-4xl font-bold text-gray-800 mb-4">Nominate a Team Coordinator</h1>
+                    <p class="text-lg text-gray-600 mb-6 leading-relaxed">
+                        First, please nominate one person in your team to be the <strong>Coordinator</strong>. This person will be responsible for adding your team's ideas to the Miro board. The rest of your team will be 'Viewers'.
+                    </p>
+                    <p class="text-lg text-gray-600 mb-6 leading-relaxed">
+                        A key principle of the Futures Wheel is ensuring that all impacts are plausible. Before the Coordinator adds an impact to the board, your team must first discuss it and agree that it is a plausible impact.
+                    </p>
+                    <div class="flex justify-center gap-6">
+                         <button id="viewer-btn" class="bg-gray-600 text-white hover:bg-gray-700 transition-colors rounded-lg py-3 px-8 font-bold text-lg">I'm a Viewer</button>
+                         <button id="coordinator-btn" class="bg-indigo-600 text-white hover:bg-indigo-700 transition-colors rounded-lg py-3 px-8 font-bold text-lg">I'm the Coordinator</button>
+                    </div>
+                </div>
+            </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Page 8: Demo and Miro Help -->
+            <div id="page-demo" class="page">
+                <div class="flex flex-col h-full w-full relative">
+                    <div id="demo-intro-overlay" class="absolute inset-0 bg-gray-900 bg-opacity-95 z-50 flex flex-col items-center justify-center p-8 transition-opacity duration-500">
+                        <!-- Demo intro content will be injected by JS -->
+                    </div>
+
+                    <div id="demo-header" class="w-full bg-white p-4 h-[92px] flex-shrink-0 flex items-center justify-between opacity-0 transition-opacity duration-300 border-b border-gray-200 mt-[60px]">
+                        <div class="w-1/4 pl-6 flex justify-start items-center gap-4">
+                            <button id="demo-collapse-cards-btn" class="hidden text-sm font-semibold text-gray-600 hover:bg-gray-200 py-2 px-3 rounded-lg transition-colors"><b>Close Idea Cards</b></button>
+                            <button id="demo-expand-cards-btn" class="text-sm font-semibold text-green-600 hover:bg-gray-200 py-2 px-3 rounded-lg transition-colors"><b>Need inspiration? Open Cards</b></button>
+                        </div>
+                        <!-- Center content -->
+                        <div class="w-1/2 text-center">
+                            <h2 class="text-lg font-semibold">Demo: Explore Miro Interface</h2>
+                            <div class="text-sm text-gray-600">Practice building your Futures Wheel</div>
+                        </div>
+                        <!-- Right content -->
+                        <div class="w-1/4 text-right pr-6 flex justify-end items-center">
+                            <!-- Button removed per requirement -->
+                        </div>
+                    </div>
+                    <main id="demo-main-content" class="flex-grow flex gap-0 p-0 overflow-hidden opacity-0 transition-opacity duration-300">
+                        <div id="demo-left-column" class="flex-col gap-4 h-full overflow-y-auto hidden" style="min-width: 300px; max-width: 60%; width: 400px; flex-shrink: 0;">
+                            <div class="bg-white p-4 rounded-lg shadow-md border border-gray-200 flex-shrink-0 m-4 mt-4">
+                                <h3 id="demo-cards-column-title" class="text-lg font-bold text-gray-800 mb-2">Risk Cards</h3>
+                                <p id="demo-cards-column-instruction" class="text-sm text-gray-600 leading-relaxed">Use these cards for context and inspiration.</p>
+                                <div id="demo-card-toggle-buttons" class="mt-4 flex gap-2">
+                                    <button id="demo-show-risks-btn" class="bg-red-100 text-red-700 font-semibold py-1 px-3 rounded-md text-sm">Show Risks</button>
+                                    <button id="demo-show-mitigations-btn" class="bg-blue-100 text-blue-700 font-semibold py-1 px-3 rounded-md text-sm">Show Mitigations</button>
+                                </div>
+                            </div>
+                            <div id="demo-cards-container" class="grid grid-cols-1 md:grid-cols-2 gap-4 p-1 mx-4">
+                                <!-- Demo cards will be injected here -->
+                            </div>
+                        </div>
+                        <div id="demo-resize-handle" class="resize-handle w-2 cursor-col-resize hidden"></div>
+                        <div id="demo-miro-column" class="flex flex-col h-full flex-grow transition-all duration-500">
+                            <div class="flex-grow bg-white rounded-lg shadow-md border border-gray-200 mr-4">
+                                <div class="miro-container border-2 border-gray-300 rounded-lg shadow-inner overflow-hidden h-full w-full">
+                                    <iframe title="Demo Miro Board" width="100%" height="100%" src="" frameborder="0" scrolling="no" allow="fullscreen; clipboard-read; clipboard-write" allowfullscreen></iframe>
+                                </div>
+                            </div>
+                        </div>
+                    </main>
+                </div>
+            </div>
+
+            <!-- Page 9: Futures Wheel Activity -->
+            <div id="page-wheel" class="page">
+                <div class="flex flex-col h-full w-full relative">
+                    <div id="risk-card-intro-overlay" class="absolute inset-0 bg-gray-900 bg-opacity-95 z-50 flex flex-col items-center justify-center p-8 transition-opacity duration-500">
+                        <!-- Intro animation content will be injected by JS -->
+                    </div>
+                     <!-- Stage Change Notification Modal -->
+                    <div id="stage-change-modal" class="hidden absolute inset-0 bg-black bg-opacity-60 z-[70] flex items-center justify-center p-4">
+                        <div class="bg-white rounded-lg shadow-xl p-8 text-center animate-fadeIn w-full max-w-2xl">
+                            <h3 id="stage-change-title" class="text-2xl font-bold mb-6 text-gray-800 leading-relaxed"></h3>
+                            <button id="stage-change-close-btn" class="bg-indigo-600 text-white font-bold py-2 px-8 rounded-lg hover:bg-indigo-700">Let's Go!</button>
+                        </div>
+                    </div>
+
+                    <div id="wheel-header" class="w-full bg-white p-4 h-[92px] flex-shrink-0 flex items-center justify-between border-b border-gray-200 opacity-0 transition-opacity duration-300 mt-[60px]">
+                        <div class="w-1/4 pl-6 flex justify-start items-center gap-4">
+                            <button id="collapse-cards-btn" class="hidden text-sm font-semibold text-gray-600 hover:bg-gray-200 py-2 px-3 rounded-lg transition-colors"><b>Close Idea Cards</b></button>
+                            <button id="expand-cards-btn" class="hidden text-sm font-semibold text-green-600 hover:bg-gray-200 py-2 px-3 rounded-lg transition-colors"><b>Need additional inspiration?<br>Open Idea Cards</b></button>
+                        </div>
+                        <!-- Center content -->
+                        <div id="activity-step-container" class="w-1/2 text-center transition-all duration-300">
+                             <h2 id="activity-step-title" class="text-xl font-semibold mb-1"></h2>
+                             <div id="activity-step-description" class="text-base mb-1"></div>
+                             <p id="miro-instruction" class="text-sm text-gray-500 italic mt-1"></p>
+                        </div>
+                        <!-- Right content -->
+                        <div class="w-1/4 text-right pr-6 flex justify-end items-center">
+                            <span id="activity-timer" class="text-3xl font-bold"></span>
+                        </div>
+                    </div>
+                    <main id="wheel-main-content" class="flex-grow flex gap-4 p-0 overflow-hidden opacity-0 transition-opacity duration-300">
+                        <div id="left-column" class="flex-col gap-4 h-full overflow-y-auto hidden" style="min-width: 300px; max-width: 60%; width: 400px; flex-shrink: 0;">
+                            <div class="bg-white p-4 rounded-lg shadow-md border border-gray-200 flex-shrink-0 m-4">
+                                <h3 id="cards-column-title" class="text-lg font-bold text-gray-800 mb-2"></h3>
+                                <p id="cards-column-instruction" class="text-sm text-gray-600 leading-relaxed"></p>
+                                <div id="card-toggle-buttons" class="hidden mt-4 flex gap-2">
+                                    <button id="show-risks-btn" class="bg-red-100 text-red-700 font-semibold py-1 px-3 rounded-md text-sm">Show Risks</button>
+                                    <button id="show-mitigations-btn" class="bg-blue-100 text-blue-700 font-semibold py-1 px-3 rounded-md text-sm">Show Mitigations</button>
+                                </div>
+                            </div>
+                            <div id="cards-container-final" class="grid grid-cols-1 md:grid-cols-2 gap-4 p-1 mx-4">
+                                <!-- Final risk/mitigation cards will be injected here -->
+                            </div>
+                        </div>
+                        <div id="resize-handle" class="resize-handle w-2 cursor-col-resize hidden"></div>
+                        <div id="miro-column" class="flex flex-col h-full flex-grow transition-all duration-500">
+                            <div class="flex-grow bg-white rounded-lg shadow-md border border-gray-200 mr-4">
+                                <div class="miro-container border-2 border-gray-300 rounded-lg shadow-inner overflow-hidden h-full w-full">
+                                    <iframe title="Miro Board" width="100%" height="100%" src="" frameborder="0" scrolling="no" allow="fullscreen; clipboard-read; clipboard-write" allowfullscreen></iframe>
+                                </div>
+                            </div>
+                        </div>
+                    </main>
+                </div>
+            </div>
+
+            <!-- Page 10: Discussion -->
+            <div id="page-discussion" class="page">
+                <div class="bg-white p-12 rounded-2xl shadow-2xl max-w-4xl w-full text-center border border-gray-200 animate-fadeIn">
+                    <h1 class="text-4xl font-bold text-gray-800 mb-6">Discussion Time</h1>
+                    <div class="text-left max-w-3xl mx-auto">
+                        <div class="bg-indigo-50 p-6 rounded-lg mb-6 border border-indigo-200">
+                            <h2 class="text-2xl font-semibold text-indigo-800 mb-4 text-center">5-Minute Team Discussion</h2>
+                            <p class="text-xl text-indigo-700 text-center font-medium">
+                                "What's one idea from today that you might share with a friend or family member?"
+                            </p>
+                        </div>
+                        <p class="text-lg text-gray-600 mb-6 leading-relaxed text-center">
+                            Take a few minutes to discuss this question with your team. Think about the insights, tools, or perspectives you've gained from the Futures Wheel exercise that could be valuable to share with others.
+                        </p>
+                    </div>
+                    <div class="flex justify-center gap-6 mt-8">
+                         <button id="discussion-continue-btn" class="bg-indigo-600 text-white hover:bg-indigo-700 transition-colors rounded-lg py-3 px-8 font-bold text-lg">Continue to Questionnaire</button>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // --- Miro Board URLs ---
+            const MIRO_URLS = {
+                demoBoard: {
+                    coordinator: 'https://miro.com/app/live-embed/uXjVJbd6N4c=/?moveToViewport=5489%2C4201%2C5354%2C3282&embedId=286245312185&autoplay=yep&embedAutoplay=true',
+                    viewer: 'https://miro.com/app/live-embed/uXjVJbd6N4c=/?embedMode=view_only_without_ui&moveToViewport=5489%2C4201%2C5354%2C3282&embedId=286245312185&autoplay=yep&embedAutoplay=true'
+                },
+                // Group-specific boards
+                groupBoards: {
+                    '2': {
+                        coordinator: 'https://miro.com/app/live-embed/uXjVJbhqFns=/?moveToViewport=-3419%2C-1380%2C5943%2C2677&embedId=597313637436&autoplay=yep&embedAutoplay=true',
+                        viewer: 'https://miro.com/app/live-embed/uXjVJbhqFns=/?embedMode=view_only_without_ui&moveToViewport=-3419%2C-1380%2C5943%2C2677&embedId=597313637436&autoplay=yep&embedAutoplay=true'
+                    },
+                    '4': {
+                        coordinator: 'https://miro.com/app/live-embed/uXjVJacrNsQ=/?moveToViewport=-3436%2C-1344%2C6002%2C2616&embedId=125778820917&autoplay=yep&embedAutoplay=true',
+                        viewer: 'https://miro.com/app/live-embed/uXjVJacrNsQ=/?embedMode=view_only_without_ui&moveToViewport=-3436%2C-1344%2C6002%2C2616&embedId=125778820917&autoplay=yep&embedAutoplay=true'
+                    },
+                    '9': {
+                        coordinator: 'https://miro.com/app/live-embed/uXjVJZXhF8A=/?moveToViewport=-3403%2C-1339%2C5966%2C2499&embedId=168239054373&autoplay=yep&embedAutoplay=true',
+                        viewer: 'https://miro.com/app/live-embed/uXjVJZXhF8A=/?embedMode=view_only_without_ui&moveToViewport=-3403%2C-1339%2C5966%2C2499&embedId=168239054373&autoplay=yep&embedAutoplay=true'
+                    },
+                    '12': {
+                        coordinator: 'https://miro.com/app/live-embed/uXjVJaXCUVU=/?moveToViewport=-3437%2C-1321%2C5977%2C2570&embedId=43020957284&autoplay=yep&embedAutoplay=true',
+                        viewer: 'https://miro.com/app/live-embed/uXjVJaXCUVU=/?embedMode=view_only_without_ui&moveToViewport=-3437%2C-1321%2C5977%2C2570&embedId=43020957284&autoplay=yep&embedAutoplay=true'
+                    }
+                }
+            };
+
+            // --- State Management ---
+            const pageSequence = ['intro', 'plan', 'icebreaker', 'tutorial', 'rules', 'demo', 'groupSelection', 'useCase', 'wheel', 'discussion'];
+            let currentPageIndex = 0;
+            let isCardsCollapsed = true;
+            let selectedGroup = null;
+            let userRole = null; // 'viewer' or 'coordinator'
+
+            const pageTitles = {
+                intro: 'Introduction',
+                plan: 'Our Plan for Today',
+                icebreaker: 'Icebreaker Task',
+                tutorial: 'Tutorial: Build the Futures Wheel',
+                rules: 'The Rule of Unanimity',
+                demo: 'Demo and Miro Help',
+                groupSelection: 'Workshop Selection',
+                useCase: 'AI Use Introduction', 
+                wheel: 'Futures Wheel Activity',
+                discussion: 'Discussion'
+            };
+            
+            // --- DOM Elements ---
+            const pages = {
+                intro: document.getElementById('page-intro'),
+                plan: document.getElementById('page-plan'),
+                icebreaker: document.getElementById('page-icebreaker'),
+                groupSelection: document.getElementById('page-groupSelection'),
+                useCase: document.getElementById('page-useCase'),
+                tutorial: document.getElementById('page-tutorial'),
+                rules: document.getElementById('page-rules'),
+                demo: document.getElementById('page-demo'),
+                wheel: document.getElementById('page-wheel'),
+                discussion: document.getElementById('page-discussion')
+            };
+            const headerTitle = document.getElementById('header-title');
+            const backBtn = document.getElementById('back-btn');
+            const nextBtn = document.getElementById('next-btn');
+            const stageChangeModal = document.getElementById('stage-change-modal');
+            const stageChangeTitle = document.getElementById('stage-change-title');
+            const stageChangeCloseBtn = document.getElementById('stage-change-close-btn');
+            
+            const collapseCardsBtn = document.getElementById('collapse-cards-btn');
+            const expandCardsBtn = document.getElementById('expand-cards-btn');
+            const leftColumn = document.getElementById('left-column');
+            const miroColumn = document.getElementById('miro-column');
+            const miroInstructionEl = document.getElementById('miro-instruction');
+            const resizeHandle = document.getElementById('resize-handle');
+            
+            const miroIframe = document.querySelector('#miro-column iframe');
+
+
+            // --- Page Navigation ---
+            function showPage(index) {
+                currentPageIndex = index;
+                const pageId = pageSequence[index];
+
+                Object.values(pages).forEach(p => p.classList.remove('active'));
+                pages[pageId].classList.add('active');
+                headerTitle.textContent = pageTitles[pageId];
+                
+                // Reset Next button text and icon to default unless on discussion page
+                if (pageId !== 'discussion') {
+                    nextBtn.innerHTML = `Next <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" /></svg>`;
+                }
+                
+                if (pageId === 'tutorial') {
+                    backBtn.style.visibility = 'hidden';
+                    nextBtn.style.visibility = 'hidden';
+                } else if (pageId === 'groupSelection') {
+                    backBtn.style.visibility = 'visible';
+                    // Show Next button if a group was already selected, otherwise hide it
+                    nextBtn.style.visibility = selectedGroup ? 'visible' : 'hidden';
+                } else if (pageId === 'rules') {
+                    backBtn.style.visibility = 'visible';
+                    nextBtn.style.visibility = 'hidden';
+                } else if (pageId === 'demo') {
+                    backBtn.style.visibility = 'visible';
+                    nextBtn.style.visibility = 'visible';
+                } else if (pageId === 'wheel') {
+                    backBtn.style.visibility = 'visible';
+                    nextBtn.style.visibility = 'visible';
+                } else if (pageId === 'discussion') {
+                    backBtn.style.visibility = 'visible';
+                    nextBtn.style.visibility = 'hidden';
+                } else {
+                    backBtn.style.visibility = 'visible';
+                    nextBtn.style.visibility = 'visible';
+                }
+                
+                if (index === 0) {
+                    backBtn.style.visibility = 'hidden';
+                } else {
+                    backBtn.onclick = goBack;
+                }
+                
+                if (pageId === 'tutorial') {
+                    initTutorial();
+                } else if (pageId === 'demo') {
+                    initDemoPage();
+                } else if (pageId === 'groupSelection') {
+                    initGroupSelection();
+                } else if (pageId === 'useCase') {
+                    initUseCase();
+                } else if (pageId === 'wheel') {
+                    // Set the appropriate Miro board when entering the wheel page
+                    const role = userRole || 'coordinator'; // Default to coordinator if no role selected
+                    const groupBoard = selectedGroup ? MIRO_URLS.groupBoards[selectedGroup][role] : MIRO_URLS.groupBoards['2'][role];
+                    miroIframe.src = groupBoard;
+                    initWheelPage();
+                }
+            }
+
+            function goBack() {
+                const onWheelPage = pageSequence[currentPageIndex] === 'wheel';
+                const onDiscussionPage = pageSequence[currentPageIndex] === 'discussion';
+                const activityInProgress = typeof currentActivityStep !== 'undefined' && currentActivityStep >= 0;
+
+                if (onDiscussionPage) {
+                    // Go back to the wheel page and the last activity step
+                    showPage(pageSequence.indexOf('wheel'));
+                    runActivityStep(activitySteps.length - 1); // Go to the last activity step
+                } else if (onWheelPage && activityInProgress && currentActivityStep > 0) {
+                    runActivityStep(currentActivityStep - 1);
+                } else if (currentPageIndex > 0) {
+                    showPage(currentPageIndex - 1);
+                }
+            }
+
+            function goNext() {
+                const onWheelPage = pageSequence[currentPageIndex] === 'wheel';
+                const onDiscussionPage = pageSequence[currentPageIndex] === 'discussion';
+                
+                if (onDiscussionPage) {
+                    window.location.href = "https://forms.office.com/e/hCc2c58wLQ";
+                    return;
+                }
+                
+                if (onWheelPage && currentActivityStep >= activitySteps.length) {
+                    showPage(pageSequence.indexOf('discussion'));
+                    return;
+                }
+                
+                const activityInProgress = typeof currentActivityStep !== 'undefined' && currentActivityStep < activitySteps.length;
+                if (onWheelPage && activityInProgress) {
+                    runActivityStep(currentActivityStep + 1);
+                } else if (currentPageIndex < pageSequence.length - 1) {
+                    showPage(currentPageIndex + 1);
+                }
+            }
+
+            
+            backBtn.style.visibility = 'hidden';
+            nextBtn.addEventListener('click', goNext);
+
+            stageChangeCloseBtn.addEventListener('click', () => {
+                stageChangeModal.classList.add('hidden');
+                stageChangeModal.classList.remove('flex');
+            });
+            
+            // Role selection buttons
+            const viewerBtn = document.getElementById('viewer-btn');
+            const coordinatorBtn = document.getElementById('coordinator-btn');
+            
+            if (viewerBtn) {
+                viewerBtn.addEventListener('click', () => {
+                    userRole = 'viewer';
+                    showPage(pageSequence.indexOf('demo'));
+                });
+            }
+            
+            if (coordinatorBtn) {
+                coordinatorBtn.addEventListener('click', () => {
+                    userRole = 'coordinator';
+                    showPage(pageSequence.indexOf('demo'));
+                });
+            }
+
+            // Demo page and other buttons
+            const discussionContinueBtn = document.getElementById('discussion-continue-btn');
+            const introQuestionnaireBtn = document.getElementById('intro-questionnaire-btn');
+            
+            if (discussionContinueBtn) {
+                discussionContinueBtn.addEventListener('click', () => {
+                    window.location.href = "https://forms.office.com/e/hCc2c58wLQ";
+                });
+            }
+
+            if (introQuestionnaireBtn) {
+                introQuestionnaireBtn.addEventListener('click', () => {
+                    window.location.href = "https://forms.office.com/e/hCc2c58wLQ";
+                });
+            }
+
+            // --- Group Selection Logic ---
+            function initGroupSelection() {
+                const group2Btn = document.getElementById('group-2-btn');
+                const group4Btn = document.getElementById('group-4-btn');
+                const group9Btn = document.getElementById('group-9-btn');
+                const group12Btn = document.getElementById('group-12-btn');
+
+                function selectGroup(group) {
+                    selectedGroup = group;
+                    // Highlight selected button
+                    document.querySelectorAll('.group-btn').forEach(btn => {
+                        btn.classList.remove('ring-4', 'ring-yellow-400', 'ring-opacity-75');
+                    });
+                    document.getElementById(`group-${group}-btn`).classList.add('ring-4', 'ring-yellow-400', 'ring-opacity-75');
+                    
+                    // Enable next button
+                    nextBtn.style.visibility = 'visible';
+                }
+
+                group2Btn.addEventListener('click', () => selectGroup('2'));
+                group4Btn.addEventListener('click', () => selectGroup('4'));
+                group9Btn.addEventListener('click', () => selectGroup('9'));
+                group12Btn.addEventListener('click', () => selectGroup('12'));
+            }
+
+            // --- Use Case Logic ---
+            function initUseCase() {
+                const useCaseTitle = document.getElementById('usecase-title');
+                const useCaseImage = document.getElementById('usecase-image');
+
+                const useCases = {
+                    '2': {
+                        title: 'The AI Use Case: Salieri the Chatbot Companion',
+                        image: 'chatbot_companion_AI_use_card.png',
+                        alt: 'Salieri the Chatbot Companion'
+                    },
+                    '4': {
+                        title: 'The AI Use Case: Salieri the Chatbot Companion',
+                        image: 'chatbot_companion_AI_use_card.png',
+                        alt: 'Salieri the Chatbot Companion'
+                    },
+                    '9': {
+                        title: 'The AI Use Case: Salieri the Chatbot Companion',
+                        image: 'chatbot_companion_AI_use_card.png',
+                        alt: 'Salieri the Chatbot Companion'
+                    },
+                    '12': {
+                        title: 'The AI Use Case: Medical AI Assistant',
+                        image: 'medical_AI_use_card.jpg',
+                        alt: 'Medical AI Assistant'
+                    }
+                };
+
+                if (selectedGroup && useCases[selectedGroup]) {
+                    const useCase = useCases[selectedGroup];
+                    useCaseTitle.textContent = useCase.title;
+                    useCaseImage.src = useCase.image;
+                    useCaseImage.alt = useCase.alt;
+                } else {
+                    // Default to Workshop 2 if no group selected
+                    const useCase = useCases['2'];
+                    useCaseTitle.textContent = useCase.title;
+                    useCaseImage.src = useCase.image;
+                    useCaseImage.alt = useCase.alt;
+                }
+            }
+
+            // --- Tutorial Logic ---
+            const tutorialSteps = [
+                { 
+                    heading: "Nominate a Coordinator", 
+                    text: "First, please choose one person in your team to be the <strong>Coordinator</strong>. This person will be in charge of writing down your team's ideas onto the interactive Miro board canvas." 
+                },
+                { 
+                    heading: "Central Topic", 
+                    text: "Start with your AI use case in the center of your Futures Wheel. For this example, we will use: 'Self-driving fully-autonomous cars become widespread.'" 
+                },
+                { 
+                    heading: "First-Order Impacts", 
+                    text: "<strong>Ask 'What happens next?'</strong> Brainstorm direct, <strong>first-order impacts</strong>. Include both positive and negative impacts without judging them. Present your impact ideas to your team, and the Coordinator will add them to the board after the group agrees to add it." 
+                },
+                { 
+                    heading: "First Ring", 
+                    text: "The Coordinator will draw the <strong>first ring</strong> around these initial impacts to complete the first layer." 
+                },
+                { 
+                    heading: "Second-Order Impacts", 
+                    text: "For each first-order impact, ask: <strong>'If this happens, what happens next?'</strong> These are your <strong>second-order impacts</strong>. Draw arrows connecting related impacts across rings. <strong>Ensure every first-order impact has at least one corresponding second-order impact.</strong>" 
+                },
+                { 
+                    heading: "Second Ring", 
+                    text: "The Coordinator will draw the <strong>second ring</strong> around the second-order impacts." 
+                },
+                { 
+                    heading: "Third-Order Impacts and Ring", 
+                    text: "Repeat for <strong>third-order impacts</strong>, ensuring each second-order impact has at least one impact. Then draw the final ring.<br><br><strong>Your Futures Wheel is complete!</strong>" 
+                },
+                { 
+                    heading: "Colour-code and Add Risks", 
+                    text: "The study coordinator will now copy over the Futures Wheel. Your team can then start <strong>colour-coding the impacts</strong> (<em>benefits</em> in green, <em>risks</em> in red, neutral impacts in grey). This helps you see patterns and priorities.<br>You can also add any new AI-related risks with the help of the <strong>Risk Idea Cards</strong>." 
+                },
+                { 
+                    heading: "Ideate Mitigations", 
+                    text: "For each risk, brainstorm specific mitigations. For example, for 'AI causes traffic jams', a mitigation could be 'Penalize residential routes in the AI's pathfinding algorithm'. Add these as <strong>blue sticky notes</strong> and draw arrows from the risk to the mitigation.<br><br><strong>The mitigations must be relevant to the AI use, such as types of regulation for self-driving cars, algorithm/model fixes, or features that help with the user's interaction with a self-driving car.</strong>" 
+                },
+                { 
+                    heading: "Mapping Complete", 
+                    text: "<strong>You have now completed the Benefit/Risk/Mitigation mapping activity!</strong>" 
+                }
+            ];
+            let currentTutorialStep = 0;
+
+            function initTutorial() {
+                const textContainer = document.getElementById('tutorial-text-container').querySelector('p');
+                const stepIndicator = document.getElementById('tutorial-step-indicator');
+                const tutorialPrevBtn = document.getElementById('tutorial-prev-btn');
+                const tutorialNextBtn = document.getElementById('tutorial-next-btn');
+
+                function updateTutorialView() {
+                    const headingContainer = document.querySelector('#tutorial-viz-parent + div h2');
+                    headingContainer.textContent = tutorialSteps[currentTutorialStep].heading;
+
+                    const headerTitle = document.getElementById('header-title');
+                    if (currentTutorialStep >= 7) { // Start "Analyse" phase from new step 8
+                        headerTitle.textContent = 'Tutorial: Analyse and Ideate';
+                    } else {
+                        headerTitle.textContent = 'Tutorial: Build the Futures Wheel';
+                    }
+                    
+                    textContainer.innerHTML = tutorialSteps[currentTutorialStep].text;
+                    stepIndicator.textContent = `Step ${currentTutorialStep + 1} of ${tutorialSteps.length}`;
+                    
+                    const isLastStep = currentTutorialStep === tutorialSteps.length - 1;
+                    tutorialNextBtn.textContent = isLastStep ? 'Continue to Use Case' : 'Next Step';
+                    tutorialPrevBtn.textContent = currentTutorialStep === 0 ? 'Back to Our Plan' : 'Previous';
+
+                    const vizContainer = document.getElementById('tutorial-viz-container');
+                    
+                    const notePositions = {
+                        center: { top: '50%', left: '50%'},
+                        n1_1: { top: '32%', left: '30%' }, n1_2: { top: '68%', left: '28%' }, n1_3: { top: '30%', left: '70%' },
+                        n2_1: { top: '18%', left: '20%' }, n2_2: { top: '82%', left: '18%' }, n2_3: { top: '18%', left: '80%' },
+                        n3_1: { top: '4%', left: '15%' }, n3_2: { top: '4%', left: '83%' },
+                        // For mitigations
+                        m1: { top: '90%', left: '45%' },
+                        m2: { top: '50%', left: '90%' },
+                        m3: { top: '10%', left: '50%' }
+                    };
+
+                    const createNote = (id, text, pos, step, color = 'gray', size = 'small') => {
+                        const colors = {
+                            gray: 'bg-gray-200 border-gray-400 text-gray-800',
+                            green: 'bg-green-200 border-green-400 text-green-800',
+                            red: 'bg-red-200 border-red-400 text-red-800',
+                            blue: 'bg-blue-200 border-blue-400 text-blue-800',
+                        };
+                        const sizes = {
+                            small: 'w-[24%] h-[16%]',
+                            large: 'w-[30%] h-[20%]'
+                        }
+                        return `<div id="${id}" class="absolute flex items-center justify-center p-2 shadow-md text-center transition-all duration-500 ${colors[color]} ${sizes[size]} rounded-lg ${currentTutorialStep >= step ? 'opacity-100 scale-100' : 'opacity-0 scale-90'}" style="top: ${pos.top}; left: ${pos.left}; transform: translate(-50%, -50%);"><span class="text-[10px] font-medium">${text}</span></div>`;
+                    };
+
+                    if (currentTutorialStep === 0) { // New "Nominate Coordinator" step
+                        vizContainer.innerHTML = `
+                        <div class="w-full h-full flex items-center justify-center animate-fadeIn">
+                             <svg xmlns="http://www.w3.org/2000/svg" class="w-48 h-48 text-indigo-200" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 4c1.93 0 3.5 1.57 3.5 3.5S13.93 13 12 13s-3.5-1.57-3.5-3.5S10.07 6 12 6zm0 14c-2.03 0-4.43-.82-6.14-2.88a9.947 9.947 0 0112.28 0C16.43 19.18 14.03 20 12 20z"/></svg>
+                        </div>`;
+                    } else {
+                         vizContainer.innerHTML = `
+                            <svg class="absolute top-0 left-0 w-full h-full overflow-visible">
+                                <defs><marker id="arrowhead" markerWidth="7" markerHeight="5" refX="0" refY="2.5" orient="auto"><polygon points="0 0, 5 2.5, 0 5" fill="#4b5563" /></marker></defs>
+                                <!-- Impact arrows -->
+                                <line x1="45%" y1="45%" x2="33%" y2="33%" class="tutorial-arrow transition-opacity duration-500 ${currentTutorialStep >= 3 ? 'opacity-100' : 'opacity-0'}" />
+                                <line x1="45%" y1="55%" x2="33%" y2="67%" class="tutorial-arrow transition-opacity duration-500 ${currentTutorialStep >= 3 ? 'opacity-100' : 'opacity-0'}" />
+                                <line x1="27%" y1="27%" x2="23%" y2="23%" class="tutorial-arrow transition-opacity duration-500 ${currentTutorialStep >= 4 ? 'opacity-100' : 'opacity-0'}" />
+                                <line x1="27%" y1="73%" x2="23%" y2="77%" class="tutorial-arrow transition-opacity duration-500 ${currentTutorialStep >= 4 ? 'opacity-100' : 'opacity-0'}" />
+                                <line x1="17%" y1="17%" x2="13%" y2="13%" class="tutorial-arrow transition-opacity duration-500 ${currentTutorialStep >= 6 ? 'opacity-100' : 'opacity-0'}" />
+                                <line x1="55%" y1="45%" x2="67%" y2="33%" class="tutorial-arrow transition-opacity duration-500 ${currentTutorialStep >= 3 ? 'opacity-100' : 'opacity-0'}" />
+                                <line x1="73%" y1="27%" x2="77%" y2="23%" class="tutorial-arrow transition-opacity duration-500 ${currentTutorialStep >= 4 ? 'opacity-100' : 'opacity-0'}" />
+                                <line x1="83%" y1="17%" x2="87%" y2="13%" class="tutorial-arrow transition-opacity duration-500 ${currentTutorialStep >= 6 ? 'opacity-100' : 'opacity-0'}" />
+                                
+                                <!-- Mitigation arrows -->
+                                <line x1="45%" y1="80%" x2="35%" y2="75%" stroke="#3b82f6" stroke-width="2" marker-end="url(#arrowhead)" class="transition-opacity duration-500 ${currentTutorialStep >= 8 ? 'opacity-100' : 'opacity-0'}" />
+                                <line x1="85%" y1="50%" x2="85%" y2="28%" stroke="#3b82f6" stroke-width="2" marker-end="url(#arrowhead)" class="transition-opacity duration-500 ${currentTutorialStep >= 8 ? 'opacity-100' : 'opacity-0'}" />
+                                <line x1="45%" y1="2%" x2="25%" y2="2%" stroke="#3b82f6" stroke-width="2" marker-end="url(#arrowhead)" class="transition-opacity duration-500 ${currentTutorialStep >= 8 ? 'opacity-100' : 'opacity-0'}" />
+                            </svg>
+                            <div class="w-[60%] aspect-square border-2 border-dashed rounded-full absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 transition-all duration-500 ${currentTutorialStep >= 3 ? 'border-gray-300 opacity-100 scale-100' : 'border-transparent opacity-0 scale-90'}"></div>
+                            <div class="w-[85%] aspect-square border-2 border-dashed rounded-full absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 transition-all duration-500 ${currentTutorialStep >= 5 ? 'border-gray-300 opacity-100 scale-100' : 'border-transparent opacity-0 scale-90'}"></div>
+                            <div class="w-[110%] aspect-square border-2 border-dashed rounded-full absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 transition-all duration-500 ${currentTutorialStep >= 6 ? 'border-gray-300 opacity-100 scale-100' : 'border-transparent opacity-0 scale-90'}"></div>
+                            <div class="w-[25%] aspect-square bg-indigo-600 text-white rounded-full flex items-center justify-center text-center p-3 shadow-lg" style="position: absolute; top: ${notePositions.center.top}; left: ${notePositions.center.left}; transform: translate(-50%, -50%);">
+                                <span class="font-bold text-xs">Self-driving cars become widespread</span>
+                            </div>
+                            
+                            ${createNote('note1', 'Fewer accidents from human error', notePositions.n1_1, 2, currentTutorialStep >= 7 ? 'green' : 'gray')}
+                            ${createNote('note2', 'AI routing causes traffic jams', notePositions.n1_2, 2, currentTutorialStep >= 7 ? 'red' : 'gray')}
+                            ${createNote('note3', 'People have freedom to drive even without a licence', notePositions.n2_1, 4, currentTutorialStep >= 7 ? 'green' : 'gray')}
+                            ${createNote('note4', 'More cars on the road', notePositions.n2_2, 4, currentTutorialStep >= 7 ? 'gray' : 'gray')}
+                            ${createNote('note5', 'More congestion (Jevons Paradox)', notePositions.n3_1, 6, currentTutorialStep >= 7 ? 'red' : 'gray')}
+                            ${createNote('note6', 'Increased mobility for elderly & disabled', notePositions.n1_3, 2, currentTutorialStep >= 7 ? 'green' : 'gray')}
+                            ${createNote('note7', 'Higher risk of fatalities with more elderly taking vehicles', notePositions.n2_3, 4, currentTutorialStep >= 7 ? 'red' : 'gray')}
+                            ${createNote('note8', 'Reduction in trust', notePositions.n3_2, 6, currentTutorialStep >= 7 ? 'gray' : 'gray')}
+
+                            <!-- Mitigations -->
+                            ${createNote('mitigation1', "Penalize residential routes in pathfinding algorithm's cost function.", notePositions.m1, 8, 'blue', 'large')}
+                            ${createNote('mitigation2', 'Offer optional "cautious driving" AI profile with proactive voice alerts.', notePositions.m2, 8, 'blue', 'large')}
+                            ${createNote('mitigation3', 'Suggest multi-modal journeys (drive+train) to reduce overall car usage.', notePositions.m3, 8, 'blue', 'large')}
+                        `;
+                    }
+                }
+
+                tutorialPrevBtn.onclick = () => {
+                    if (currentTutorialStep > 0) {
+                        currentTutorialStep--;
+                        updateTutorialView();
+                    } else {
+                        showPage(currentPageIndex - 1);
+                    }
+                };
+                tutorialNextBtn.onclick = () => {
+                    if (currentTutorialStep === tutorialSteps.length - 1) {
+                        showPage(currentPageIndex + 1);
+                    } else {
+                        currentTutorialStep++;
+                        updateTutorialView();
+                    }
+                };
+                
+                currentTutorialStep = 0;
+                updateTutorialView();
+            }
+
+            // --- Demo Page Logic ---
+            function initDemoPage() {
+                const overlay = document.getElementById('demo-intro-overlay');
+                const demoHeader = document.getElementById('demo-header');
+                const demoMainContent = document.getElementById('demo-main-content');
+                const demoMiroIframe = document.querySelector('#demo-miro-column iframe');
+                
+                // Set the demo Miro URL
+                const role = userRole || 'coordinator'; // Default to coordinator if no role selected
+                demoMiroIframe.src = MIRO_URLS.demoBoard[role];
+                
+                overlay.classList.remove('hidden');
+                overlay.classList.add('flex');
+                overlay.style.opacity = '1';
+
+                overlay.innerHTML = `
+                    <div class="text-center mb-8">
+                        <h2 class="text-3xl font-bold text-white mb-2">Demo and Miro Help</h2>
+                        <p class="text-lg text-gray-300">Take some time to explore the Miro interface and practice before the main activity.</p>
+                        <p class="text-md text-gray-400 mt-4">You can use the Risk and Mitigation cards for inspiration while exploring.</p>
+                    </div>
+                    <div id="demo-cards-animation-container" class="relative w-64 h-96"></div>
+                    <button id="start-demo-btn" class="mt-8 bg-white text-indigo-600 font-bold py-3 px-8 rounded-lg text-lg hover:bg-gray-200 transition-colors shadow-lg">
+                        Explore Miro
+                    </button>
+                `;
+                
+                const animationContainer = document.getElementById('demo-cards-animation-container');
+                const introTransforms = ['rotate-[-15deg] translate-x-[-60px]', 'rotate-[-9deg] translate-x-[-30px]', 'rotate-[-3deg]', 'rotate-[3deg]', 'rotate-[9deg] translate-x-[30px]', 'rotate-[15deg] translate-x-[60px]'];
+                riskCardData.forEach((card, index) => {
+                    const cardEl = document.createElement('div');
+                    cardEl.className = 'risk-card-flyer absolute top-0 left-0 w-full h-full';
+                    cardEl.style.transform = introTransforms[index];
+                    cardEl.innerHTML = createCardHTML(card);
+                    animationContainer.appendChild(cardEl);
+                });
+
+                document.getElementById('start-demo-btn').onclick = () => {
+                    overlay.style.opacity = '0';
+                    setTimeout(() => {
+                        overlay.classList.add('hidden');
+                        demoHeader.classList.remove('opacity-0');
+                        demoMainContent.classList.remove('opacity-0');
+                        initDemoCards();
+                    }, 500);
+                };
+            }
+
+            function initDemoCards() {
+                let isDemoCardsCollapsed = false;
+                const demoLeftColumn = document.getElementById('demo-left-column');
+                const demoMiroColumn = document.getElementById('demo-miro-column');
+                const demoCollapseBtn = document.getElementById('demo-collapse-cards-btn');
+                const demoExpandBtn = document.getElementById('demo-expand-cards-btn');
+                const demoResizeHandle = document.getElementById('demo-resize-handle');
+
+                function updateDemoLayout() {
+                    if (!isDemoCardsCollapsed) {
+                        demoLeftColumn.classList.remove('hidden');
+                        demoLeftColumn.classList.add('flex');
+                        demoResizeHandle.classList.remove('hidden');
+                        demoCollapseBtn.classList.remove('hidden');
+                        demoExpandBtn.classList.add('hidden');
+                        if (!demoLeftColumn.style.width) {
+                            demoLeftColumn.style.width = '400px';
+                        }
+                    } else {
+                        demoLeftColumn.classList.add('hidden');
+                        demoLeftColumn.classList.remove('flex');
+                        demoResizeHandle.classList.add('hidden');
+                        demoExpandBtn.classList.remove('hidden');
+                        demoCollapseBtn.classList.add('hidden');
+                    }
+                }
+
+                demoCollapseBtn.addEventListener('click', () => {
+                    isDemoCardsCollapsed = true;
+                    updateDemoLayout();
+                });
+
+                demoExpandBtn.addEventListener('click', () => {
+                    isDemoCardsCollapsed = false;
+                    updateDemoLayout();
+                });
+
+                // Initialize with cards showing
+                populateCards(document.getElementById('demo-cards-container'), riskCardData);
+                updateDemoLayout();
+
+                document.getElementById('demo-show-risks-btn').addEventListener('click', () => {
+                    document.getElementById('demo-cards-column-title').textContent = 'Risk Cards';
+                    document.getElementById('demo-cards-column-instruction').textContent = 'Use these cards for context and inspiration.';
+                    populateCards(document.getElementById('demo-cards-container'), riskCardData);
+                });
+
+                document.getElementById('demo-show-mitigations-btn').addEventListener('click', () => {
+                    document.getElementById('demo-cards-column-title').textContent = 'Mitigation Idea Cards';
+                    document.getElementById('demo-cards-column-instruction').textContent = 'Use these cards to brainstorm solutions and safeguards.';
+                    populateCards(document.getElementById('demo-cards-container'), mitigationCardData);
+                });
+            }
+
+            // --- Wheel Page & Activity Step Logic ---
+            const riskCardData = [
+                 { title: 'Unfair Treatment', description: 'What is the consequence if the system is biased?<br>What happens if unbalanced training data causes the AI to perform differently for different people?', example: 'For example, a voice assistant might not understand users with a strong regional accent, making the service hard to use for them.', color: 'blue' },
+                 { title: 'Data Privacy', description: 'What is the consequence if there is a privacy issue?<br>What could happen when users enter personal information into the system?', example: "For example, an AI analysing shopping habits could guess a user's secret medical condition and show them targeted ads.", color: 'teal' },
+                 { title: 'False Information', description: 'What is the consequence if the system produces an invalid output?<br>What could happen if the AI hallucinates and provides incorrect or nonsensical information?', example: 'For example, a lawyer used an AI for research that invented several fake legal cases, which were then submitted to a real court.', color: 'purple' },
+                 { title: 'Malicious Use', description: 'What is the consequence if there is a security issue?<br>How could the system be used for harmful purposes?', example: 'For example, an AI designed for creative writing could be used to generate large volumes of fake news articles or propaganda.', color: 'amber' },
+                 { title: 'Unhealthy Use', description: "What is the consequence of unhealthy use?<br>How could long-term use of the AI negatively affect a person's well-being or habits?", example: "For example, a productivity AI could create unrealistic expectations of efficiency, leading to employee burnout.", color: 'rose' },
+                 { title: 'Societal Harm', description: 'What is the consequence if the AI harms society?<br>How could our system disrupt social structures, jobs, or the environment?', example: 'For example, the massive amount of electricity needed to train a powerful AI model could contribute to climate change.', color: 'indigo' }
+            ];
+            
+            const mitigationCardData = [
+                 { title: 'Fairness Testing & Audits', description: 'How can we regularly test the model for bias? What metrics should we use? Who should be involved in the audit process?', color: 'blue' },
+                 { title: 'Data Minimisation & Anonymisation', description: 'What is the absolute minimum data we need to collect? How can we anonymise or de-identify user data to protect privacy?', color: 'teal' },
+                 { title: 'Fact-Checking & Source Transparency', description: 'How can we verify the information the AI provides? Can we show users the sources of the information?', color: 'purple' },
+                 { title: 'Security Safeguards & Access Controls', description: 'How can we prevent unauthorised access? What are the potential ways the system could be abused, and how do we block them?', color: 'amber' },
+                 { title: 'Usage Limits & Well-being Nudges', description: 'Should we limit how much time a user can spend with the AI? Can we design features that encourage users to connect with real people?', color: 'rose' },
+                 { title: 'Ethical Review & Impact Assessment', description: 'Who should review the potential societal impact before launch? How can we measure and monitor for unintended negative impacts?', color: 'indigo' }
+            ];
+
+            function createCardHTML(card) {
+                const colorClasses = { blue: 'border-blue-500', teal: 'border-teal-500', purple: 'border-purple-500', amber: 'border-amber-500', rose: 'border-rose-500', indigo: 'border-indigo-500' };
+                const bgClasses = { blue: 'bg-blue-100 text-blue-600', teal: 'bg-teal-100 text-teal-600', purple: 'bg-purple-100 text-purple-600', amber: 'bg-amber-100 text-amber-600', rose: 'bg-rose-100 text-rose-600', indigo: 'bg-indigo-100 text-indigo-600' };
+                const icons = {
+                    blue: `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />`,
+                    teal: `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />`,
+                    purple: `<path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />`,
+                    amber: `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" />`,
+                    rose: `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z" />`,
+                    indigo: `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 8h6m-5 4h4m5 4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2z" />`
+                };
+                const exampleHTML = card.example ? `<p class="text-xs italic text-slate-500 mt-2">${card.example}</p>` : '';
+                return `
+                    <div class="bg-white border-l-4 ${colorClasses[card.color]} rounded-lg shadow-lg p-4 w-full h-full flex flex-col transition-transform transform hover:-translate-y-1 hover:shadow-xl">
+                        <div class="flex items-center mb-3">
+                            <div class="p-2 rounded-full ${bgClasses[card.color]}">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">${icons[card.color]}</svg>
+                            </div>
+                            <h2 class="text-md font-bold text-slate-800 ml-2">${card.title}</h2>
+                        </div>
+                        <div class="text-slate-600 text-sm leading-relaxed space-y-2">
+                            <p>${card.description}</p>
+                            ${exampleHTML}
+                        </div>
+                    </div>
+                `;
+            }
+
+            function populateCards(container, cardData) {
+                container.innerHTML = '';
+                cardData.forEach((card, index) => {
+                    const cardWrapper = document.createElement('div');
+                    cardWrapper.className = 'card-wrapper transition-all duration-500 transform-gpu opacity-0 translate-y-5';
+                    cardWrapper.style.transitionDelay = `${index * 100}ms`;
+                    cardWrapper.innerHTML = createCardHTML(card);
+                    container.appendChild(cardWrapper);
+                    setTimeout(() => cardWrapper.classList.remove('opacity-0', 'translate-y-5'), 50);
+                });
+            }
+
+            const activitySteps = [
+                { phase: 'Build the wheel', title: 'First ring (15 min)', description: 'Given the trend in the center, ask: <strong>"What happens next?"</strong>', miro: '', duration: 15 * 60, color: 'text-gray-700' },
+                { phase: 'Build the wheel', title: 'Second ring (15 min)', description: 'Draw a ring around your 1st-order impacts if you have not already. Now, forget the Central Trend. Given the 1st-order impacts you have identified, ask for each of them: <strong>"What happens next?"</strong>', miro: '', duration: 15 * 60, color: 'text-gray-700' },
+                { phase: 'Build the wheel', title: 'Third ring (15 min)', description: 'Draw a ring around your 2nd-order impacts if you have not already. Now, forget the 1st-order impacts. Given the 2nd-order impacts you have identified, ask for each of them: <strong>"What happens next?"</strong>', miro: '', duration: 15 * 60, color: 'text-gray-700' },
+                { 
+                    phase: 'Analyse and ideate', 
+                    title: 'Consolidate: Colour-code & Add Risks (10 min)', 
+                    description: 'Consolidate your wheel, add any new AI-risks and Colour-code impacts (green/red/grey).',
+                    question: '<strong>Time to analyse the wheel!</strong><br><br>The coordinator will copy over the wheel. You can then start colour-coding the impacts as either green (for benefits), red (for risks/negative impacts), or leave grey (neutral). Your team may also add any new AI-related risks with the help of the <strong>Risk Idea Cards</strong>.',
+                    miro: '', 
+                    useGroupBoard: true,
+                    duration: 600, 
+                    color: 'text-orange-600' 
+                },
+                { 
+                    phase: 'Analyse and ideate', 
+                    title: 'Ideate Mitigations (25 min)', 
+                    description: 'For each risk, add at least one mitigation (blue sticky). Draw arrows to connect them.',
+                    question: '<strong>Now for the final step: Mitigations!</strong><br><br>Place <strong>blue sticky notes</strong> next to the risks to represent mitigations. You must have at least <strong>one mitigation for every risk</strong>. Draw arrows to connect them to the relevant risk.<br>Ensure that your mitigations are plausable and are relevant to the AI use, these should be features, policies, or interventions that directly relate to the AI - not broad societal solutions.',
+                    miro: '', 
+                    useGroupBoard: true,
+                    duration: 1500, 
+                    color: 'text-blue-600' 
+                }
+            ];
+            let currentActivityStep = -1;
+            let countdownInterval;
+
+            function initWheelPage() {
+                const overlay = document.getElementById('risk-card-intro-overlay');
+                const wheelHeader = document.getElementById('wheel-header');
+                const wheelMainContent = document.getElementById('wheel-main-content');
+                
+                overlay.classList.remove('hidden');
+                overlay.classList.add('flex');
+                overlay.style.opacity = '1';
+
+                overlay.innerHTML = `
+                    <div class="text-center mb-8">
+                        <h2 class="text-3xl font-bold text-white mb-2">Need some ideas for risks?</h2>
+                        <p class="text-lg text-gray-300">Use these Risk Cards as prompts if you get stuck during the activity.</p>
+                        <p class="text-md text-gray-400 mt-4">These cards will start collapsed, but you can view them anytime by clicking "<b>Need additional inspiration? - Open Idea Cards</b>".</p>
+                    </div>
+                    <div id="intro-cards-animation-container" class="relative w-64 h-96"></div>
+                    <button id="start-activity-btn" class="mt-8 bg-white text-indigo-600 font-bold py-3 px-8 rounded-lg text-lg hover:bg-gray-200 transition-colors shadow-lg">
+                        Start!
+                    </button>
+                `;
+                
+                const animationContainer = document.getElementById('intro-cards-animation-container');
+                const introTransforms = ['rotate-[-15deg] translate-x-[-60px]', 'rotate-[-9deg] translate-x-[-30px]', 'rotate-[-3deg]', 'rotate-[3deg]', 'rotate-[9deg] translate-x-[30px]', 'rotate-[15deg] translate-x-[60px]'];
+                riskCardData.forEach((card, index) => {
+                    const cardEl = document.createElement('div');
+                    cardEl.className = 'risk-card-flyer absolute top-0 left-0 w-full h-full';
+                    cardEl.style.transform = introTransforms[index];
+                    cardEl.innerHTML = createCardHTML(card);
+                    animationContainer.appendChild(cardEl);
+                });
+
+                document.getElementById('start-activity-btn').onclick = () => {
+                    overlay.style.opacity = '0';
+                    setTimeout(() => {
+                        overlay.classList.add('hidden');
+                        wheelHeader.classList.remove('opacity-0');
+                        wheelMainContent.classList.remove('opacity-0');
+                        runActivityStep(0);
+                    }, 500);
+                };
+            }
+            
+            function updateColumnLayout() {
+                const step = activitySteps[currentActivityStep];
+                const canShowCards = step && (step.phase === 'Build the wheel' || step.phase === 'Analyse and ideate');
+
+                if (canShowCards && !isCardsCollapsed) {
+                    leftColumn.classList.remove('hidden');
+                    leftColumn.classList.add('flex');
+                    // Always show the resize handle when cards are expanded
+                    resizeHandle.classList.remove('hidden');
+                    collapseCardsBtn.classList.remove('hidden');
+                    expandCardsBtn.classList.add('hidden');
+                    // Only set default width if no width is set (first open)
+                    if (!leftColumn.style.width || leftColumn.style.width === '') {
+                        leftColumn.style.width = '400px';
+                        leftColumn.style.flexBasis = '400px';
+                        leftColumn.style.flexShrink = '0';
+                        leftColumn.style.flexGrow = '0';
+                    }
+                    // Always clear miroColumn inline styles so it can flex
+                    miroColumn.style.width = '';
+                    miroColumn.style.flexBasis = '';
+                    miroColumn.style.flexShrink = '';
+                    miroColumn.style.flexGrow = '';
+                } else {
+                    leftColumn.classList.add('hidden');
+                    leftColumn.classList.remove('flex');
+                    // Only hide the resize handle if cards are collapsed
+                    if (isCardsCollapsed) {
+                        resizeHandle.classList.add('hidden');
+                    } else {
+                        // Always show the resize handle if cards are expanded
+                        resizeHandle.classList.remove('hidden');
+                    }
+                    // Only clear inline styles if cards are being collapsed (not just hidden for other reasons)
+                    if (isCardsCollapsed) {
+                        leftColumn.style.width = '';
+                        leftColumn.style.flexBasis = '';
+                        leftColumn.style.flexShrink = '';
+                        leftColumn.style.flexGrow = '';
+                        miroColumn.style.width = '';
+                        miroColumn.style.flexBasis = '';
+                        miroColumn.style.flexShrink = '';
+                        miroColumn.style.flexGrow = '';
+                    }
+                    if (canShowCards && isCardsCollapsed) {
+                        expandCardsBtn.classList.remove('hidden');
+                        collapseCardsBtn.classList.add('hidden');
+                    } else {
+                        expandCardsBtn.classList.add('hidden');
+                        collapseCardsBtn.classList.add('hidden');
+                    }
+                }
+            }
+            
+            collapseCardsBtn.addEventListener('click', () => {
+                isCardsCollapsed = true;
+                updateColumnLayout();
+            });
+            
+            expandCardsBtn.addEventListener('click', () => {
+                isCardsCollapsed = false;
+                updateColumnLayout();
+            });
+
+            function runActivityStep(stepIndex) {
+                clearInterval(countdownInterval);
+                
+                if (stepIndex > 0 && stepIndex < activitySteps.length) {
+                    const prevStep = activitySteps[stepIndex - 1];
+                    const currentStep = activitySteps[stepIndex];
+                    
+                    if (currentStep.question || (prevStep.phase !== currentStep.phase)) {
+                        stageChangeModal.classList.remove('hidden');
+                        stageChangeModal.classList.add('flex');
+                        if (currentStep.question) {
+                            stageChangeTitle.innerHTML = currentStep.question;
+                        } else {
+                            stageChangeTitle.innerHTML = `Great work! Now it's time to <strong>${currentStep.phase}</strong>.`;
+                        }
+                    }
+                }
+                
+                if (stepIndex >= activitySteps.length) {
+                    document.getElementById('activity-step-title').innerHTML = 'Futures Wheel Activity Complete!';
+                    document.getElementById('activity-step-description').textContent = 'You have successfully completed the Futures Wheel.';
+                    document.getElementById('activity-timer').textContent = '';
+                    miroInstructionEl.textContent = '';
+                    nextBtn.disabled = false;
+                    nextBtn.innerHTML = `Continue to Discussion <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" /></svg>`;
+                    currentActivityStep = activitySteps.length;
+                    updateColumnLayout();
+                    return;
+                }
+
+                // Reset button text to "Next" when navigating to any step within the activity
+                nextBtn.innerHTML = `Next <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" /></svg>`;
+
+                currentActivityStep = stepIndex;
+                const step = activitySteps[stepIndex];
+                
+                if (step.miroUrl) {
+                    miroIframe.src = step.miroUrl;
+                } else if (step.useGroupBoard) {
+                    // Use the appropriate group board or default to workshop 2 with user role
+                    const role = userRole || 'coordinator'; // Default to coordinator if no role selected
+                    const groupBoard = selectedGroup ? MIRO_URLS.groupBoards[selectedGroup][role] : MIRO_URLS.groupBoards['2'][role];
+                    miroIframe.src = groupBoard;
+                }
+
+                const cardsContainer = document.getElementById('cards-container-final');
+                const cardToggleButtons = document.getElementById('card-toggle-buttons');
+                
+                updateColumnLayout();
+
+                const canShowCards = step.phase === 'Build the wheel' || step.phase === 'Analyse and ideate';
+                if (canShowCards) {
+                    cardToggleButtons.classList.remove('hidden');
+                    if (step.title.includes('Mitigations')) {
+                        document.getElementById('show-mitigations-btn').click();
+                    } else {
+                        document.getElementById('show-risks-btn').click();
+                    }
+                } else {
+                     cardToggleButtons.classList.add('hidden');
+                }
+
+                const titleEl = document.getElementById('activity-step-title');
+                const descriptionEl = document.getElementById('activity-step-description');
+                const timerEl = document.getElementById('activity-timer');
+
+                titleEl.innerHTML = `${step.phase}: <span class="font-normal">${step.title}</span>`;
+                descriptionEl.innerHTML = step.description;
+                miroInstructionEl.innerHTML = step.miro;
+                titleEl.className = `text-xl font-semibold ${step.color}`;
+                timerEl.className = `text-4xl font-bold text-black`;
+
+                backBtn.disabled = false;
+                nextBtn.disabled = false;
+
+                // Only show timers for coordinators, not viewers
+                if (step.duration && userRole === 'coordinator') {
+                    let timeLeft = step.duration;
+                    const updateTimer = () => {
+                        const minutes = Math.floor(timeLeft / 60);
+                        const seconds = timeLeft % 60;
+                        timerEl.textContent = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+                        if (timeLeft <= 15 && timeLeft > 0) {
+                            timerEl.classList.add('text-red-600');
+                            timerEl.classList.remove('text-black');
+                        } else {
+                             timerEl.classList.remove('text-red-600');
+                             timerEl.classList.add('text-black');
+                        }
+                    };
+                    updateTimer();
+                    countdownInterval = setInterval(() => {
+                        if (timeLeft <= 0) {
+                            // Dont autoprogress.
+                        }
+                        else{
+                            timeLeft--;
+                            updateTimer();
+                        }
+                        
+                    }, 1000);
+                } else {
+                    timerEl.textContent = '';
+                }
+            }
+            
+            document.getElementById('show-risks-btn').addEventListener('click', () => {
+                document.getElementById('cards-column-title').textContent = 'Risk Cards';
+                document.getElementById('cards-column-instruction').textContent = 'Use these cards for context and inspiration.';
+                populateCards(document.getElementById('cards-container-final'), riskCardData);
+            });
+
+            document.getElementById('show-mitigations-btn').addEventListener('click', () => {
+                document.getElementById('cards-column-title').textContent = 'Mitigation Idea Cards';
+                document.getElementById('cards-column-instruction').textContent = 'Use these cards to brainstorm solutions and safeguards.';
+                populateCards(document.getElementById('cards-container-final'), mitigationCardData);
+            });
+
+            // --- Resize Handle Logic ---
+            let isResizing = false;
+            let startX = 0;
+            let startLeftWidth = 0;
+            
+            resizeHandle.addEventListener('mousedown', (e) => {
+                isResizing = true;
+                startX = e.clientX;
+                startLeftWidth = leftColumn.offsetWidth;
+                resizeHandle.classList.add('dragging');
+                document.body.style.cursor = 'col-resize';
+                document.body.style.userSelect = 'none';
+                
+                // Add a temporary overlay to prevent iframe from capturing events
+                const overlay = document.createElement('div');
+                overlay.id = 'resize-overlay';
+                overlay.style.cssText = `
+                    position: fixed;
+                    top: 0;
+                    left: 0;
+                    width: 100%;
+                    height: 100%;
+                    z-index: 9999;
+                    cursor: col-resize;
+                    background: transparent;
+                `;
+                document.body.appendChild(overlay);
+                
+                e.preventDefault();
+                e.stopPropagation();
+            });
+            
+            document.addEventListener('mousemove', (e) => {
+                if (!isResizing) return;
+                
+                // Prevent default behaviors during drag
+                e.preventDefault();
+                e.stopPropagation();
+                
+                const deltaX = e.clientX - startX;
+                const newLeftWidth = startLeftWidth + deltaX;
+                const mainContent = document.getElementById('wheel-main-content');
+                const maxWidth = mainContent.offsetWidth * 0.6; // Max 60% of container
+                const minWidth = 300; // Min 300px
+                
+                const constrainedWidth = Math.max(minWidth, Math.min(maxWidth, newLeftWidth));
+                
+                // Update the left column width
+                leftColumn.style.width = `${constrainedWidth}px`;
+                leftColumn.style.flexBasis = `${constrainedWidth}px`;
+                leftColumn.style.flexShrink = '0';
+                leftColumn.style.flexGrow = '0';
+                
+                // Update the miro column to take remaining space
+                const resizeHandleWidth = resizeHandle.offsetWidth;
+                const remainingWidth = mainContent.offsetWidth - constrainedWidth - resizeHandleWidth - 32; // 32px for gaps
+                miroColumn.style.width = `${remainingWidth}px`;
+                miroColumn.style.flexBasis = `${remainingWidth}px`;
+                miroColumn.style.flexShrink = '0';
+                miroColumn.style.flexGrow = '0';
+                // Always show the resize handle after resizing
+                resizeHandle.classList.remove('hidden');
+            });
+            
+            document.addEventListener('mouseup', (e) => {
+                if (isResizing) {
+                    isResizing = false;
+                    resizeHandle.classList.remove('dragging');
+                    document.body.style.cursor = '';
+                    document.body.style.userSelect = '';
+                    
+                    // Remove the overlay
+                    const overlay = document.getElementById('resize-overlay');
+                    if (overlay) {
+                        overlay.remove();
+                    }
+                    
+                    // Prevent any default behaviors
+                    e.preventDefault();
+                    e.stopPropagation();
+                }
+            });
+
+            // Handle mouse leave events to prevent losing drag state when cursor moves fast
+            document.addEventListener('mouseleave', (e) => {
+                // Only reset if mouse actually leaves the document entirely
+                if (isResizing && !e.relatedTarget) {
+                    isResizing = false;
+                    resizeHandle.classList.remove('dragging');
+                    document.body.style.cursor = '';
+                    document.body.style.userSelect = '';
+                    
+                    // Remove the overlay
+                    const overlay = document.getElementById('resize-overlay');
+                    if (overlay) {
+                        overlay.remove();
+                    }
+                }
+            });
+
+            // Handle case where iframe might capture mouse events
+            if (miroIframe) {
+                miroIframe.addEventListener('mouseenter', () => {
+                    if (isResizing) {
+                        // Stop resize if mouse enters iframe during drag
+                        isResizing = false;
+                        resizeHandle.classList.remove('dragging');
+                        document.body.style.cursor = '';
+                        document.body.style.userSelect = '';
+                    }
+                });
+            }
+
+            // --- Initial Load ---
+            showPage(0);
+        });
+    </script>
+</body>
+</html>
