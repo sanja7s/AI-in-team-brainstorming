@@ -1,6 +1,6 @@
 # FlowGuide Brainstorming Assistant for Miro
 
-![FlowGuide Logo](materials/FlowGuide.png)
+<img src="materials/FlowGuide.png" alt="FlowGuide Logo" width="33%">
 
 A Miro-integrated workshop assistant that helps facilitate brainstorming sessions for impact assessment of AI systems. This tool supports structured workshop methods, and is co-designed to support the right points of AI interventions.
 
@@ -16,11 +16,11 @@ FlowGuide integrates with Miro boards to facilitate various workshop formats and
 - **Free-form Workshops**: Unstructured brainstorming
 - **Futures Wheel Workshops**: Explore cause-and-effect relationships and potential consequences
   
-  ![Futures Wheel Example](materials/FW.jpg)
+  <img src="materials/FW.jpg" alt="Futures Wheel Example" width="90%">
   
 - **Empathy Mapping Workshops**: Understand stakeholder perspectives and impacts
   
-  ![Empathy Mapping Example](materials/EM.jpg)
+  <img src="materials/EM.jpg" alt="Empathy Mapping Example" width="90%">
 
 
 ### AI Use Case Scenarios
@@ -28,11 +28,11 @@ The assistant comes with pre-configured AI scenarios for workshop activities:
 
 - **Chatbot Companion AI** (Salieri): Emotional support and companionship system
   
-  ![Chatbot AI Use Case](chatbot_companion_AI_use_card.png)
+  <img src="chatbot_companion_AI_use_card.png" alt="Chatbot AI Use Case" width="70%">
   
 - **Medical AI**: Autonomous organ transplant allocation system
   
-  ![Medical AI Use Case](medical_AI_use_card.jpg)
+  <img src="medical_AI_use_card.jpg" alt="Medical AI Use Case" width="70%">
   
 - **Self-driving Car AI** (Altair): Autonomous vehicle navigation system
 - **AI Artist**: 3D model generation for game development
