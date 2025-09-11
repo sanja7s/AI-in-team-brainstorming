@@ -1,39 +1,54 @@
-# AI Risk & Mitigation Assistant for Miro
+# FlowGuide Brainstorming Assistant for Miro
 
-A Miro-integrated workshop assistant that helps facilitate AI risk assessment and mitigation brainstorming sessions. This tool combines structured workshop methodologies with AI-powered suggestions to help teams identify potential risks, develop mitigation strategies, and explore benefits of AI systems.
+![FlowGuide Logo](materials/FlowGuide.png)
+
+A Miro-integrated workshop assistant that helps facilitate brainstorming sessions for impact assessment of AI systems. This tool supports structured workshop methods, and is co-designed to support the right points of AI interventions.
 
 ## Overview
 
-The AI Risk & Mitigation Assistant is designed for research workshops focused on AI ethics, risk assessment, and responsible AI development. It integrates with Miro boards to facilitate two primary workshop formats:
+FlowGuide integrates with Miro boards to facilitate various workshop formats and AI uses:
 
-- **Futures Wheel Workshops**: Explore cause-and-effect relationships and potential consequences
-- **Empathy Mapping Workshops**: Understand stakeholder perspectives and impacts
-
-## Key Features
 
 ### Workshop Formats
-- **Futures Wheel**: Interactive brainstorming for exploring consequences and impacts
-- **Empathy Mapping**: Stakeholder-focused analysis with persona-based insights
-- **Free-form Brainstorming**: Flexible workshop structure based on Futures Wheel methodology
+
+![Methodology Overview](materials/methodology.jpg)
+
+- **Free-form Workshops**: Unstructured brainstorming
+- **Futures Wheel Workshops**: Explore cause-and-effect relationships and potential consequences
+  
+  ![Futures Wheel Example](materials/FW.jpg)
+  
+- **Empathy Mapping Workshops**: Understand stakeholder perspectives and impacts
+  
+  ![Empathy Mapping Example](materials/EM.jpg)
+
 
 ### AI Use Case Scenarios
 The assistant comes with pre-configured AI scenarios for workshop activities:
+
 - **Chatbot Companion AI** (Salieri): Emotional support and companionship system
-- **Medical AI**: Autonomous organ transplant allocation system  
+  
+  ![Chatbot AI Use Case](chatbot_companion_AI_use_card.png)
+  
+- **Medical AI**: Autonomous organ transplant allocation system
+  
+  ![Medical AI Use Case](medical_AI_use_card.jpg)
+  
 - **Self-driving Car AI** (Altair): Autonomous vehicle navigation system
 - **AI Artist**: 3D model generation for game development
 
-### AI-Powered Assistance
+### Features
 - **Risk Generation**: Automatically suggests potential risks based on EU AI Act, SDGs, and Human Rights frameworks
 - **Mitigation Strategies**: Proposes practical mitigation approaches
 - **Benefits Analysis**: Identifies positive impacts and opportunities
-- **Personal AI Assistant**: Interactive chat interface for brainstorming support
+- **Personal Chat Assistant**: Interactive chat interface for brainstorming support
 
 ### Integration Features
 - **Miro Board Reading**: Automatically reads and analyzes Miro board content
 - **Selected Item Analysis**: Focuses on specific board elements
 - **Real-time Suggestions**: Provides contextual AI-powered recommendations
 - **Auto-idea Generation**: Configurable timer-based suggestion system
+- **External Expertise**: Provides information on related incidents
 
 ## Technical Architecture
 
@@ -51,12 +66,8 @@ The assistant comes with pre-configured AI scenarios for workshop activities:
   - Benefits analyst  
   - Personal assistant with comprehensive AI ethics knowledge
 
-### Workshop Structure
-- **Group Mappings**: Supports workshops 4-13 with different AI use case combinations
-- **Empathy Modes**: Persona-based analysis and impact assessment
-- **Timer Controls**: Auto-suggestion intervals (default 10 minutes)
 
-## Risk Assessment Framework
+### Risk Assessment Framework
 
 The tool uses a comprehensive framework combining:
 - **EU AI Act**: Compliance requirements for high-risk AI systems
@@ -74,7 +85,7 @@ The tool uses a comprehensive framework combining:
 
 ### Setup
 1. Host the application locally or on a web server
-2. Configure Miro Developer Team and app permissions
+2. Configure Miro Developer Team to point to your application and give app permissions
 3. Install the app to your Miro team
 4. Configure API keys for GPT integration
 
@@ -99,8 +110,16 @@ The tool uses a comprehensive framework combining:
 │   ├── index.html          # Miro app entry point
 │   ├── app.html           # Main application interface
 │   └── assets/            # Compiled assets and resources
+├── materials/              # Documentation images
+│   ├── FlowGuide.png      # Project logo
+│   ├── methodology.jpg    # Workshop methodology overview
+│   ├── FW.jpg            # Futures Wheel example
+│   └── EM.jpg            # Empathy Mapping example
 ├── empathy_mapping.html    # Standalone empathy mapping workshop
 ├── futures_wheel.html     # Standalone futures wheel workshop
+├── control_brainstorming.html # Standalone free-form brainstorming workshop
+├── chatbot_companion_AI_use_card.png # Chatbot use case image
+├── medical_AI_use_card.jpg # Medical AI use case image
 └── README.md              # This file
 ```
 

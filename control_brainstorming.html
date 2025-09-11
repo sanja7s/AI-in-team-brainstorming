@@ -1,0 +1,713 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Brainstorming Workshop</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body, html {
+            height: 100%;
+            overflow: hidden;
+            font-family: 'Inter', sans-serif;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        main {
+            position: relative;
+        }
+        .page {
+            position: absolute;
+            inset: 0;
+            padding: 2rem; /* 32px */
+            display: none;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+        }
+        .page.active {
+            display: flex;
+        }
+        .page#page-brainstorm {
+            align-items: stretch;
+            justify-content: flex-start;
+            padding: 0;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px) scale(0.98); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+        .animate-fadeIn {
+            animation: fadeIn 0.5s ease-in-out forwards;
+        }
+        .miro-container {
+            height: 100%;
+            width: 100%;
+        }
+        .group-btn.selected {
+            box-shadow: 0 0 0 4px #fbbf24; /* amber-400 ring */
+            transform: scale(1.05);
+        }
+        .resize-handle {
+            cursor: col-resize;
+            background: linear-gradient(90deg, transparent 0%, #d1d5db 45%, #9ca3af 50%, #d1d5db 55%, transparent 100%);
+            transition: background-color 0.2s ease;
+        }
+        .resize-handle:hover {
+            background: linear-gradient(90deg, transparent 0%, #9ca3af 45%, #6b7280 50%, #9ca3af 55%, transparent 100%);
+        }
+    </style>
+</head>
+<body class="bg-gray-100">
+
+    <div id="app-container" class="h-screen flex flex-col">
+        <!-- Header -->
+        <header id="main-header" class="bg-white shadow-md p-4 h-[80px] flex items-center justify-between sticky top-0 z-40 w-full flex-shrink-0">
+            <div class="w-28">
+                <button id="back-btn" class="flex items-center gap-2 text-gray-700 hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed transition-colors rounded-lg py-2 px-4 font-bold text-lg">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd" /></svg>
+                    Back
+                </button>
+            </div>
+            <h1 id="header-title" class="text-xl md:text-2xl font-bold text-gray-800 text-center"></h1>
+            <div class="w-28">
+                <button id="next-btn" class="flex items-center gap-2 text-white bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors rounded-lg py-2 px-4 font-bold text-lg">
+                    Next
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" /></svg>
+                </button>
+            </div>
+        </header>
+
+        <!-- Main Content Area -->
+        <main class="flex-grow overflow-hidden">
+            
+            <!-- Page 0: Introduction -->
+            <div id="page-intro" class="page active">
+                <div class="bg-white p-12 rounded-2xl shadow-2xl max-w-4xl w-full text-center border border-gray-200 animate-fadeIn">
+                    <h1 class="text-4xl font-bold text-gray-800 mb-6">Welcome to the Brainstorming Workshop</h1>
+                    <p class="text-xl text-gray-600 mb-8 leading-relaxed">A brainstorming session to identify the benefits, risks, and mitigations of an AI application.</p>
+                    <p class="text-lg text-red-600 font-bold">Note: This experience is not supported on Safari. Please use Google Chrome or Mozilla Firefox.</p>
+                    <p class="text-md text-gray-500">Click "Next" to begin.</p>
+                </div>
+            </div>
+
+            <!-- Page 1: Our Plan -->
+            <div id="page-plan" class="page">
+                <div class="bg-white p-12 rounded-2xl shadow-2xl max-w-4xl w-full text-left border border-gray-200 animate-fadeIn">
+                    <h1 class="text-4xl font-bold text-gray-800 mb-6">Brainstorming Workshop Plan</h1>
+                    <p class="text-lg text-gray-600 mb-8 leading-relaxed">
+                        <strong>Introduction (5 min):</strong> We will start with team introductions.
+                        <br><br><strong>Icebreaker activity/warm-up (5 min):</strong> A quick warm-up exercise to get everyone thinking about AI.
+                        <br><br><strong>Instructions for Miro (5 min):</strong> We will quickly go over the guidelines for our brainstorming session and show you how to use Miro.
+                        <br><br><strong>Open brainstorming (40 min):</strong> Your team will brainstorm anything related to the AI use case - benefits, risks, mitigations, or neutral observations. Think out of the box! Use colored sticky notes: red for risks, green for benefits, blue for mitigations, grey for neutral.
+                        <br><br><strong>Group and consolidate ideas (35 min):</strong> Organize your ideas by grouping similar notes, expanding on them, and adding new ideas as needed.
+                        <br><br><strong>Workshop conclusion (5 min):</strong> We will wrap up with key takeaways and reflections on the process.
+                        <br><br><strong>Complete Post-study Questionnaire (10 min):</strong> Finally, you will each complete a post-study questionnaire.
+                    </p>
+                    <p class="text-md text-gray-500 mt-6">Click "Next" to continue.</p>
+                </div>
+            </div>
+
+            <!-- Page 2: Icebreaker Task -->
+            <div id="page-icebreaker" class="page">
+                <div class="bg-white p-8 rounded-2xl shadow-2xl max-w-6xl w-full border border-gray-200 animate-fadeIn">
+                    <h1 class="text-4xl font-bold text-gray-800 mb-6 text-center">Icebreaker Task</h1>
+                    <div class="flex flex-col lg:flex-row gap-8 items-start">
+                        <!-- Left side: Instructions -->
+                        <div class="w-full lg:w-1/2">
+                            <h2 class="text-2xl font-semibold text-gray-800 mb-4">POLAK TASK (ICEBREAKER):</h2>
+                            <p class="text-lg text-gray-600 mb-6 leading-relaxed">
+                                Before we dive into the Brainstorming activity, let's start with a quick icebreaker to get everyone thinking about AI and our ability to influence its future.
+                            </p>
+                            <div class="bg-gray-50 p-6 rounded-lg mb-6">
+                                <p class="text-lg text-gray-700 mb-4">Consider the following two dimensions in the context of <strong>the future of AI</strong>:</p>
+                                <ul class="text-lg text-gray-700 space-y-2 ml-4">
+                                    <li><strong>Y-axis:</strong> Optimistic vs. Pessimistic about AI's impact</li>
+                                    <li><strong>X-axis:</strong> Cannot make a difference vs. Can make a difference in shaping AI's future</li>
+                                </ul>
+                            </div>
+                            <p class="text-lg text-gray-600 mb-4">
+                                Think about where you would place yourself on these two axes and be ready to share your position with the group.
+                            </p>
+                        </div>
+                        
+                        <!-- Right side: Quadrant Plot -->
+                        <div class="w-full lg:w-1/2 flex justify-center">
+                            <div class="relative w-80 h-80 bg-white border-2 border-gray-300 rounded-lg shadow-sm">
+                                <!-- Axes -->
+                                <div class="absolute left-1/2 top-0 w-px h-full bg-gray-400"></div>
+                                <div class="absolute top-1/2 left-0 w-full h-px bg-gray-400"></div>
+                                
+                                <!-- Quadrant Labels -->
+                                <div class="absolute top-6 left-6 text-center">
+                                    <div class="text-sm font-semibold text-green-600">Optimistic</div>
+                                    <div class="text-xs text-gray-500 mt-1">Cannot influence</div>
+                                </div>
+                                
+                                <div class="absolute top-6 right-6 text-center">
+                                    <div class="text-sm font-semibold text-green-600">Optimistic</div>
+                                    <div class="text-xs text-gray-500 mt-1">Can influence</div>
+                                </div>
+                                
+                                <div class="absolute bottom-6 left-6 text-center">
+                                    <div class="text-sm font-semibold text-red-600">Pessimistic</div>
+                                    <div class="text-xs text-gray-500 mt-1">Cannot influence</div>
+                                </div>
+                                
+                                <div class="absolute bottom-6 right-6 text-center">
+                                    <div class="text-sm font-semibold text-red-600">Pessimistic</div>
+                                    <div class="text-xs text-gray-500 mt-1">Can influence</div>
+                                </div>
+                                
+                                <!-- Axis Labels -->
+                                <div class="absolute -top-8 left-1/2 transform -translate-x-1/2 text-sm font-medium text-gray-600">
+                                    Optimistic
+                                </div>
+                                <div class="absolute -bottom-8 left-1/2 transform -translate-x-1/2 text-sm font-medium text-gray-600">
+                                    Pessimistic
+                                </div>
+                                <div class="absolute top-1/2 -left-16 transform -translate-y-1/2 -rotate-90 text-sm font-medium text-gray-600">
+                                    Cannot influence
+                                </div>
+                                <div class="absolute top-1/2 -right-16 transform -translate-y-1/2 rotate-90 text-sm font-medium text-gray-600">
+                                    Can influence
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <p class="text-md text-gray-500 mt-6 text-center">Click "Next" to continue.</p>
+                </div>
+            </div>
+
+            <!-- Page 3: Guidelines -->
+            <div id="page-guidelines" class="page">
+                <div class="bg-white p-12 rounded-2xl shadow-2xl max-w-3xl w-full text-left border border-gray-200 animate-fadeIn">
+                    <h1 class="text-4xl font-bold text-gray-800 mb-6">Brainstorming Guidelines</h1>
+                     <ul class="text-lg text-gray-600 mb-8 leading-relaxed list-disc pl-6 space-y-4">
+                        <li><strong>Nominate a Coordinator:</strong> Choose one person to add your team's ideas to the Miro board.</li>
+                        <li><strong>Think Broadly:</strong> Brainstorm anything related to the AI use case - benefits, risks, mitigations, or neutral observations.</li>
+                        <li><strong>Use Color Coding:</strong> Red sticky notes for risks, green for benefits, blue for mitigations, grey for neutral observations.</li>
+                        <li><strong>Welcome Wild Ideas:</strong> Encourage creative and unusual suggestions. Feel free to think out-of-the-box and consider both common and rare ideas.</li>
+                        <li><strong>Build on Others' Ideas:</strong> Listen to your teammates and think about how you can combine, improve, or extend their ideas.</li>
+                        <li><strong>Stay Focused:</strong> All ideas must be plausible and directly related to the AI use case.</li>
+                    </ul>
+                    <p class="text-md text-gray-500 mt-6">Click "Next" to see a demo of how to use Miro.</p>
+                </div>
+            </div>
+
+            <!-- Page 4: Demo and Miro Help -->
+            <div id="page-demo" class="page">
+                <div class="flex flex-col h-full w-full relative">
+                    <div id="demo-intro-overlay" class="absolute inset-0 bg-gray-900 bg-opacity-95 z-50 flex flex-col items-center justify-center p-8 transition-opacity duration-500">
+                        <!-- Demo intro content will be injected by JS -->
+                    </div>
+
+                    <div id="demo-header" class="w-full bg-white p-2 h-[50px] flex-shrink-0 flex items-center justify-between border-b border-gray-200 opacity-0 transition-opacity duration-300">
+                        <div class="w-1/4 pl-6 flex justify-start items-center gap-4">
+                            <button id="demo-collapse-cards-btn" class="hidden text-sm font-semibold text-gray-600 hover:bg-gray-200 py-1 px-2 rounded-lg transition-colors"><b>Close Help</b></button>
+                            <button id="demo-expand-cards-btn" class="text-sm font-semibold text-green-600 hover:bg-gray-200 py-1 px-2 rounded-lg transition-colors"><b>Need help? Open Guide</b></button>
+                        </div>
+                        <!-- Right content -->
+                        <div class="w-1/4 text-right pr-6 flex justify-end items-center">
+                            <button id="demo-continue-btn" class="bg-indigo-600 text-white hover:bg-indigo-700 transition-colors rounded-lg py-2 px-6 font-bold">Continue to Group Selection</button>
+                        </div>
+                    </div>
+                    <main id="demo-main-content" class="flex-grow flex gap-4 p-4 overflow-hidden opacity-0 transition-opacity duration-300">
+                        <div id="demo-left-column" class="flex-col gap-4 h-full overflow-y-auto hidden" style="min-width: 300px; max-width: 60%; width: 400px; flex-shrink: 0;">
+                            <div class="bg-white p-4 rounded-lg shadow-md border border-gray-200 flex-shrink-0">
+                                <h3 id="demo-cards-column-title" class="text-lg font-bold text-gray-800 mb-2">Miro Help Guide</h3>
+                                <p id="demo-cards-column-instruction" class="text-sm text-gray-600 leading-relaxed">Quick tips for using Miro effectively during brainstorming.</p>
+                            </div>
+                            <div id="demo-cards-container" class="grid grid-cols-1 gap-4 p-1">
+                                <!-- Demo guide cards will be injected here -->
+                            </div>
+                        </div>
+                        <div id="demo-resize-handle" class="resize-handle w-2 cursor-col-resize hidden"></div>
+                        <div id="demo-miro-column" class="flex flex-col h-full flex-grow transition-all duration-500">
+                            <div class="flex-grow bg-white p-1 rounded-lg shadow-md border border-gray-200">
+                                <div class="miro-container border-2 border-gray-300 rounded-lg shadow-inner overflow-hidden h-full w-full">
+                                    <iframe title="Demo Miro Board" width="100%" height="100%" src="" frameborder="0" scrolling="no" allow="fullscreen; clipboard-read; clipboard-write" allowfullscreen></iframe>
+                                </div>
+                            </div>
+                        </div>
+                    </main>
+                </div>
+            </div>
+
+            <!-- Page 5: Group Selection -->
+            <div id="page-groupSelection" class="page">
+                <div class="bg-white p-12 rounded-2xl shadow-2xl max-w-4xl w-full text-center border border-gray-200 animate-fadeIn">
+                    <h1 class="text-4xl font-bold text-gray-800 mb-6">Select Your Group</h1>
+                    <p class="text-lg text-gray-600 mb-8 leading-relaxed">
+                        Please select your assigned group by clicking one of the buttons below.
+                    </p>
+                    <div class="flex justify-center gap-8 mb-8">
+                        <button id="group-c-btn" class="group-btn bg-blue-600 hover:bg-blue-700 text-white font-bold py-6 px-12 rounded-2xl text-3xl transition-colors shadow-lg transform hover:scale-105" data-group="C">
+                            C
+                        </button>
+                        <button id="group-m-btn" class="group-btn bg-green-600 hover:bg-green-700 text-white font-bold py-6 px-12 rounded-2xl text-3xl transition-colors shadow-lg transform hover:scale-105" data-group="M">
+                            M
+                        </button>
+                        <button id="group-a-btn" class="group-btn bg-purple-600 hover:bg-purple-700 text-white font-bold py-6 px-12 rounded-2xl text-3xl transition-colors shadow-lg transform hover:scale-105" data-group="A">
+                            A
+                        </button>
+                    </div>
+                    <p class="text-md text-gray-500">After selecting your group, you'll see your AI use case.</p>
+                </div>
+            </div>
+
+            <!-- Page 6: AI Use Case -->
+            <div id="page-useCase" class="page">
+                <div class="bg-white p-12 rounded-2xl shadow-2xl max-w-4xl w-full text-center border border-gray-200 animate-fadeIn">
+                    <h1 id="usecase-title" class="text-3xl font-bold text-gray-800 mb-6">The AI Use Case</h1>
+                    <img id="usecase-image" src="" alt="AI Use Case" class="rounded-lg shadow-md mb-8 w-full object-cover border border-gray-200" onerror="this.onerror=null;this.src='https://placehold.co/800x450/e2e8f0/64748b?text=Image+not+available';">
+                    <p id="usecase-description" class="text-lg text-gray-600 mb-4 leading-relaxed">We will use this AI use case for our brainstorming exercise.</p>
+                    <p class="text-md text-gray-500">Click "Next" to start the brainstorming session.</p>
+                </div>
+            </div>
+
+            <!-- Page 7: Brainstorming Activity -->
+            <div id="page-brainstorm" class="page">
+                <div class="flex flex-col h-full w-full">
+                     <!-- Stage Change Notification Modal -->
+                    <div id="stage-change-modal" class="hidden absolute inset-0 bg-black bg-opacity-60 z-[70] flex items-center justify-center p-4">
+                        <div class="bg-white rounded-lg shadow-xl p-8 text-center animate-fadeIn w-full max-w-2xl">
+                            <h3 id="stage-change-title" class="text-2xl font-bold mb-6 text-gray-800 leading-relaxed"></h3>
+                            <button id="stage-change-close-btn" class="bg-indigo-600 text-white font-bold py-2 px-8 rounded-lg hover:bg-indigo-700">Let's Go!</button>
+                        </div>
+                    </div>
+
+                    <div id="brainstorm-header" class="w-full bg-white p-4 h-[72px] flex-shrink-0 flex items-center justify-between border-b border-gray-200">
+                        <div class="w-1/4 pl-6"></div>
+                        <div id="activity-step-container" class="w-1/2 text-center">
+                             <h2 id="activity-step-title" class="text-xl font-semibold"></h2>
+                             <div id="activity-step-description" class="text-sm"></div>
+                        </div>
+                        <div class="w-1/4 text-right pr-6 flex justify-end items-center">
+                            <span id="activity-timer" class="text-4xl font-bold"></span>
+                        </div>
+                    </div>
+                    <main id="brainstorm-main-content" class="flex-grow flex p-4 overflow-hidden">
+                        <div id="miro-column" class="flex flex-col h-full flex-grow">
+                            <div class="flex-grow bg-white p-1 rounded-lg shadow-md border border-gray-200">
+                                <div class="miro-container border-2 border-gray-300 rounded-lg shadow-inner overflow-hidden h-full w-full">
+                                    <iframe title="Miro Board" width="100%" height="100%" src="" frameborder="0" scrolling="no" allow="fullscreen; clipboard-read; clipboard-write" allowfullscreen></iframe>
+                                </div>
+                            </div>
+                        </div>
+                    </main>
+                </div>
+            </div>
+
+            <!-- Page 8: Discussion -->
+            <div id="page-discussion" class="page">
+                <div class="bg-white p-12 rounded-2xl shadow-2xl max-w-4xl w-full text-center border border-gray-200 animate-fadeIn">
+                    <h1 class="text-4xl font-bold text-gray-800 mb-6">Discussion Time</h1>
+                    <div class="text-left max-w-3xl mx-auto">
+                        <div class="bg-indigo-50 p-6 rounded-lg mb-6 border border-indigo-200">
+                            <h2 class="text-2xl font-semibold text-indigo-800 mb-4 text-center">5-Minute Team Discussion</h2>
+                            <p class="text-xl text-indigo-700 text-center font-medium">
+                                "What's one idea from today that you might share with a friend or family member?"
+                            </p>
+                        </div>
+                        <p class="text-lg text-gray-600 mb-6 leading-relaxed text-center">
+                            Take a few minutes to discuss this question with your team. Think about the insights, tools, or perspectives you've gained from the Brainstorming exercise that could be valuable to share with others.
+                        </p>
+                    </div>
+                    <div class="flex justify-center gap-6 mt-8">
+                         <button id="discussion-continue-btn" class="bg-indigo-600 text-white hover:bg-indigo-700 transition-colors rounded-lg py-3 px-8 font-bold text-lg">Continue to Questionnaire</button>
+                    </div>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // --- Miro Board URLs ---
+            const MIRO_URLS = {
+                demoBoard: 'YOUR MIRO BOARD LINK',
+                mainBoards: {
+                    'C': 'YOUR MIRO BOARD LINK',
+                    'M': 'YOUR MIRO BOARD LINK',
+                    'A': 'YOUR MIRO BOARD LINK' // Default URL for group A
+                }
+            };
+
+            // --- State Management ---
+            const pageSequence = ['intro', 'plan', 'icebreaker', 'guidelines', 'demo', 'groupSelection', 'useCase', 'brainstorm', 'discussion'];
+            let currentPageIndex = 0;
+            let selectedGroup = null;
+
+            const pageTitles = {
+                intro: 'Introduction',
+                plan: 'Our Plan for Today',
+                icebreaker: 'Icebreaker Task',
+                guidelines: 'Brainstorming Guidelines',
+                demo: 'Demo and Miro Help',
+                groupSelection: 'Group Selection',
+                useCase: 'AI Use Introduction',
+                brainstorm: 'Brainstorming Session',
+                discussion: 'Discussion'
+            };
+            
+            // --- DOM Elements ---
+            const pages = {
+                intro: document.getElementById('page-intro'),
+                plan: document.getElementById('page-plan'),
+                icebreaker: document.getElementById('page-icebreaker'),
+                groupSelection: document.getElementById('page-groupSelection'),
+                useCase: document.getElementById('page-useCase'),
+                guidelines: document.getElementById('page-guidelines'),
+                demo: document.getElementById('page-demo'),
+                brainstorm: document.getElementById('page-brainstorm'),
+                discussion: document.getElementById('page-discussion')
+            };
+            const headerTitle = document.getElementById('header-title');
+            const backBtn = document.getElementById('back-btn');
+            const nextBtn = document.getElementById('next-btn');
+            const stageChangeModal = document.getElementById('stage-change-modal');
+            const stageChangeTitle = document.getElementById('stage-change-title');
+            const stageChangeCloseBtn = document.getElementById('stage-change-close-btn');
+
+            // --- Page Navigation ---
+            function showPage(index) {
+                currentPageIndex = index;
+                const pageId = pageSequence[index];
+
+                Object.values(pages).forEach(p => p.classList.remove('active'));
+                pages[pageId].classList.add('active');
+                headerTitle.textContent = pageTitles[pageId];
+                
+                backBtn.style.visibility = index > 0 ? 'visible' : 'hidden';
+                nextBtn.style.visibility = 'visible';
+                
+                if (pageId === 'groupSelection') initGroupSelection();
+                if (pageId === 'useCase') initUseCase();
+                if (pageId === 'demo') initDemoPage();
+                if (pageId === 'brainstorm') {
+                    initBrainstormPage();
+                }
+                if (pageId === 'discussion') initDiscussion();
+            }
+
+            function goBack() {
+                const onBrainstormPage = pageSequence[currentPageIndex] === 'brainstorm';
+                const activityInProgress = typeof currentActivityStep !== 'undefined' && currentActivityStep >= 0;
+
+                if (onBrainstormPage && activityInProgress && currentActivityStep > 0) {
+                     runActivityStep(currentActivityStep - 1);
+                } else if (currentPageIndex > 0) {
+                    showPage(currentPageIndex - 1);
+                }
+            }
+
+            function goNext() {
+                const onBrainstormPage = pageSequence[currentPageIndex] === 'brainstorm';
+                if (onBrainstormPage && currentActivityStep >= activitySteps.length - 1) {
+                    // Go to discussion page instead of direct redirect
+                    showPage(pageSequence.indexOf('discussion'));
+                    return;
+                }
+                
+                const activityInProgress = typeof currentActivityStep !== 'undefined' && currentActivityStep < activitySteps.length;
+                if (onBrainstormPage && activityInProgress) {
+                    runActivityStep(currentActivityStep + 1);
+                } else if (currentPageIndex < pageSequence.length - 1) {
+                    showPage(currentPageIndex + 1);
+                }
+            }
+            
+            backBtn.addEventListener('click', goBack);
+            nextBtn.addEventListener('click', goNext);
+
+            stageChangeCloseBtn.addEventListener('click', () => {
+                stageChangeModal.classList.add('hidden');
+                stageChangeModal.classList.remove('flex');
+            });
+
+            // --- Group Selection Logic ---
+            function initGroupSelection() {
+                const groupButtons = document.querySelectorAll('.group-btn');
+                groupButtons.forEach(button => {
+                    button.addEventListener('click', function() {
+                        const group = this.getAttribute('data-group');
+                        selectGroup(group);
+                    });
+                });
+                
+                // Reset state
+                groupButtons.forEach(btn => btn.classList.remove('selected'));
+                selectedGroup = null;
+                nextBtn.disabled = true;
+            }
+
+            function selectGroup(group) {
+                selectedGroup = group;
+                const groupButtons = document.querySelectorAll('.group-btn');
+                groupButtons.forEach(btn => {
+                    btn.classList.remove('selected');
+                    if (btn.getAttribute('data-group') === group) {
+                        btn.classList.add('selected');
+                    }
+                });
+                nextBtn.disabled = false;
+            }
+
+            // --- Use Case Logic ---
+            function initUseCase() {
+                const useCaseTitle = document.getElementById('usecase-title');
+                const useCaseImage = document.getElementById('usecase-image');
+
+                const useCases = {
+                    'C': {
+                        title: 'The AI Use Case: Salieri the Chatbot Companion',
+                        image: 'chatbot_companion_AI_use_card.png',
+                        alt: 'Salieri the Chatbot Companion'
+                    },
+                    'M': {
+                        title: 'The AI Use Case: Medical AI Assistant',
+                        image: 'medical_AI_use_card.jpg',
+                        alt: 'Medical AI Assistant'
+                    },
+                    'A': {
+                        title: 'The AI Use Case: Artist AI Creator',
+                        image: 'https://placehold.co/800x450/e2e8f0/64748b?text=Artist+AI+Creator',
+                        alt: 'Artist AI Creator'
+                    }
+                };
+
+                if (selectedGroup && useCases[selectedGroup]) {
+                    const useCase = useCases[selectedGroup];
+                    useCaseTitle.textContent = useCase.title;
+                    useCaseImage.src = useCase.image;
+                    useCaseImage.alt = useCase.alt;
+                } else {
+                    // Default to chatbot if no group selected
+                    const useCase = useCases['C'];
+                    useCaseTitle.textContent = useCase.title;
+                    useCaseImage.src = useCase.image;
+                    useCaseImage.alt = useCase.alt;
+                }
+            }
+
+            // --- Discussion Logic ---
+            function initDiscussion() {
+                // Set up discussion continue button
+                const discussionContinueBtn = document.getElementById('discussion-continue-btn');
+                if (discussionContinueBtn) {
+                    discussionContinueBtn.addEventListener('click', () => {
+                        window.location.href = "YOUR_QUESTIONNAIRE_URL";
+                    });
+                }
+            }
+
+            // --- Demo Logic ---
+            function initDemoPage() {
+                const overlay = document.getElementById('demo-intro-overlay');
+                const demoHeader = document.getElementById('demo-header');
+                const demoMainContent = document.getElementById('demo-main-content');
+                const demoMiroIframe = document.querySelector('#demo-miro-column iframe');
+                const demoContinueBtn = document.getElementById('demo-continue-btn');
+                const demoExpandBtn = document.getElementById('demo-expand-cards-btn');
+                const demoCollapseBtn = document.getElementById('demo-collapse-cards-btn');
+                
+                // Set the demo Miro URL
+                demoMiroIframe.src = MIRO_URLS.demoBoard;
+                
+                overlay.classList.remove('hidden');
+                overlay.classList.add('flex');
+                overlay.style.opacity = '1';
+
+                overlay.innerHTML = `
+                    <div class="bg-white rounded-lg shadow-xl p-8 text-center animate-fadeIn w-full max-w-3xl">
+                        <h2 class="text-3xl font-bold text-gray-800 mb-6">Miro Board Demo</h2>
+                        <p class="text-lg text-gray-600 mb-6 leading-relaxed">
+                            This is your Miro board where you'll add your brainstorming ideas. You can add sticky notes, move them around, and organize your thoughts.
+                        </p>
+                        <div class="bg-gray-50 p-4 rounded-lg mb-6">
+                            <p class="text-sm text-gray-700 mb-2"><strong>Color Coding:</strong></p>
+                            <div class="flex justify-center gap-4 text-sm">
+                                <span class="px-2 py-1 bg-red-200 text-red-800 rounded">Red = Risks</span>
+                                <span class="px-2 py-1 bg-green-200 text-green-800 rounded">Green = Benefits</span>
+                                <span class="px-2 py-1 bg-blue-200 text-blue-800 rounded">Blue = Mitigations</span>
+                                <span class="px-2 py-1 bg-gray-200 text-gray-800 rounded">Grey = Neutral</span>
+                            </div>
+                        </div>
+                        <button id="demo-start-btn" class="bg-indigo-600 text-white font-bold py-3 px-8 rounded-lg hover:bg-indigo-700 text-lg">
+                            Explore the Board
+                        </button>
+                    </div>
+                `;
+                
+                const demoStartBtn = document.getElementById('demo-start-btn');
+                demoStartBtn.addEventListener('click', () => {
+                    overlay.style.opacity = '0';
+                    setTimeout(() => {
+                        overlay.classList.add('hidden');
+                        overlay.classList.remove('flex');
+                        demoHeader.style.opacity = '1';
+                        demoMainContent.style.opacity = '1';
+                    }, 500);
+                });
+
+                // Set up expand/collapse functionality
+                demoExpandBtn.addEventListener('click', () => {
+                    document.getElementById('demo-left-column').classList.remove('hidden');
+                    document.getElementById('demo-left-column').classList.add('flex');
+                    document.getElementById('demo-resize-handle').classList.remove('hidden');
+                    demoExpandBtn.classList.add('hidden');
+                    demoCollapseBtn.classList.remove('hidden');
+                    
+                    // Populate with Miro help guide
+                    const cardsContainer = document.getElementById('demo-cards-container');
+                    cardsContainer.innerHTML = `
+                        <div class="bg-white border border-gray-200 rounded-lg p-4 shadow-sm">
+                            <h4 class="font-semibold text-gray-800 mb-2">Adding Sticky Notes</h4>
+                            <p class="text-sm text-gray-600">Double-click anywhere on the board to add a new sticky note. Choose the color that matches your idea type.</p>
+                        </div>
+                        <div class="bg-white border border-gray-200 rounded-lg p-4 shadow-sm">
+                            <h4 class="font-semibold text-gray-800 mb-2">Moving Ideas</h4>
+                            <p class="text-sm text-gray-600">Click and drag sticky notes to move them around and organize your thoughts.</p>
+                        </div>
+                        <div class="bg-white border border-gray-200 rounded-lg p-4 shadow-sm">
+                            <h4 class="font-semibold text-gray-800 mb-2">Editing Text</h4>
+                            <p class="text-sm text-gray-600">Double-click on any sticky note to edit its text content.</p>
+                        </div>
+                        <div class="bg-white border border-gray-200 rounded-lg p-4 shadow-sm">
+                            <h4 class="font-semibold text-gray-800 mb-2">Grouping Ideas</h4>
+                            <p class="text-sm text-gray-600">Move related sticky notes close together to create logical groups during the organizing phase.</p>
+                        </div>
+                    `;
+                });
+
+                demoCollapseBtn.addEventListener('click', () => {
+                    document.getElementById('demo-left-column').classList.add('hidden');
+                    document.getElementById('demo-left-column').classList.remove('flex');
+                    document.getElementById('demo-resize-handle').classList.add('hidden');
+                    demoCollapseBtn.classList.add('hidden');
+                    demoExpandBtn.classList.remove('hidden');
+                });
+
+                // Continue button functionality
+                demoContinueBtn.addEventListener('click', () => {
+                    goNext();
+                });
+            }
+
+            // --- Brainstorming Page & Activity Step Logic ---
+            const activitySteps = [
+                { 
+                    title: 'Stage 1: Open Brainstorming (40 min)', 
+                    description: 'Think of anything related to the AI use case - benefits, risks, mitigations, or neutral observations. Use colored sticky notes and think out of the box!',
+                    duration: 2400, // 40 minutes
+                    question: "Let's begin the open brainstorming session!<br><br>For the next 40 minutes, brainstorm <strong>anything</strong> related to the AI use case. Use the color-coded sticky notes:<br><br><span style='color: #dc2626'>🔴 Red = Risks</span><br><span style='color: #16a34a'>🟢 Green = Benefits</span><br><span style='color: #2563eb'>🔵 Blue = Mitigations</span><br><span style='color: #6b7280'>⚫ Grey = Neutral observations</span>"
+                },
+                { 
+                    title: 'Stage 2: Group & Consolidate Ideas (35 min)', 
+                    description: 'Organize your ideas by grouping similar notes, expanding on them, and adding new ideas as needed. Move to the right frame on the board.',
+                    duration: 2100, // 35 minutes
+                    question: "Time to organize and expand!<br><br>For the next 35 minutes, work together to <strong>group similar ideas</strong>, expand on existing notes, and add any new ideas that come up. Use the right frame on the Miro board for your organized thoughts."
+                }
+            ];
+            let currentActivityStep = -1;
+            let countdownInterval;
+
+            function initBrainstormPage() {
+                // Set the Miro board URL based on selected group
+                const miroIframe = document.querySelector('#miro-column iframe');
+                if (miroIframe) {
+                    const groupUrl = MIRO_URLS.mainBoards[selectedGroup] || MIRO_URLS.mainBoards['C']; // Default to C if no group selected
+                    miroIframe.src = groupUrl;
+                }
+                runActivityStep(0);
+            }
+
+            function runActivityStep(stepIndex) {
+                clearInterval(countdownInterval);
+                
+                if (stepIndex > 0 && stepIndex < activitySteps.length) {
+                    const currentStep = activitySteps[stepIndex];
+                    if (currentStep.question) {
+                        stageChangeModal.classList.remove('hidden');
+                        stageChangeModal.classList.add('flex');
+                        stageChangeTitle.innerHTML = currentStep.question;
+                    }
+                } else if (stepIndex === 0) { // Show modal for the very first step
+                     const currentStep = activitySteps[stepIndex];
+                     stageChangeModal.classList.remove('hidden');
+                     stageChangeModal.classList.add('flex');
+                     stageChangeTitle.innerHTML = currentStep.question;
+                }
+                
+                if (stepIndex >= activitySteps.length) {
+                    document.getElementById('activity-step-title').innerHTML = 'Workshop Complete!';
+                    document.getElementById('activity-step-description').textContent = 'You have successfully completed the brainstorming session.';
+                    document.getElementById('activity-timer').textContent = '';
+                    nextBtn.disabled = false;
+                    nextBtn.innerHTML = `To the Questionnaire <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" /></svg>`;
+                    currentActivityStep = activitySteps.length;
+                    return;
+                }
+
+                currentActivityStep = stepIndex;
+                const step = activitySteps[stepIndex];
+                
+                const titleEl = document.getElementById('activity-step-title');
+                const descriptionEl = document.getElementById('activity-step-description');
+                const timerEl = document.getElementById('activity-timer');
+
+                titleEl.innerHTML = step.title;
+                descriptionEl.innerHTML = step.description;
+                timerEl.className = `text-4xl font-bold text-black`;
+
+                nextBtn.disabled = false;
+                
+                if (stepIndex === activitySteps.length - 1) {
+                   nextBtn.innerHTML = `Finish <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" /></svg>`;
+                } else {
+                   nextBtn.innerHTML = `Next Stage <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" /></svg>`;
+                }
+
+
+                if (step.duration) {
+                    let timeLeft = step.duration;
+                    const updateTimer = () => {
+                        const minutes = Math.floor(timeLeft / 60);
+                        const seconds = timeLeft % 60;
+                        timerEl.textContent = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+                        if (timeLeft <= 15 && timeLeft > 0) {
+                            timerEl.classList.add('text-red-600');
+                            timerEl.classList.remove('text-black');
+                        } else {
+                            timerEl.classList.remove('text-red-600');
+                            timerEl.classList.add('text-black');
+                        }
+                    };
+                    updateTimer();
+                    countdownInterval = setInterval(() => {
+                        if (timeLeft <= 0) {
+                           // Stop timer but don't auto-advance
+                           clearInterval(countdownInterval);
+                           timerEl.textContent = "00:00";
+                        }
+                        else {
+                            timeLeft--;
+                            updateTimer();
+                        }
+                    }, 1000);
+                } else {
+                    timerEl.textContent = '';
+                }
+            }
+
+            // --- Initial Load ---
+            showPage(0);
+        });
+    </script>
+</body>
+</html>
