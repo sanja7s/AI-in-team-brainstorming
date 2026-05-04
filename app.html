@@ -21,12 +21,12 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    
+    <link rel="stylesheet" href="/src/assets/style.css" />
     <script src="https://miro.com/app/static/sdk/v2/miro.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <title>AI Risk & Mitigation Assistant</title>
+    <title>Workshop Companion</title>
     <style>
       body {
         font-family: 'Inter', sans-serif;
@@ -645,14 +645,8 @@
         overflow: visible;
       }
 
-      /* Hide buttons 4-10 */
-      #group-4-btn, #group-5-btn, #group-6-btn, #group-7-btn, 
-      #group-8-btn, #group-9-btn, #group-10-btn {
-        display: none !important;
-      }
+      /* All workshop buttons should be available — do not hide any here. */
     </style>
-    <script type="module" crossorigin src="./assets/index.795af313.js"></script>
-    <link rel="stylesheet" href="./assets/index.f9186f78.css">
   </head>
   <body>
     <!-- Flash Notification -->
@@ -668,7 +662,7 @@
       <!-- Group Selection Screen -->
       <div id="group-selection-screen" class="container" style="display: block;">
         <div class="main-header">
-          <h1>🤖 AI Risk & Mitigation Assistant</h1>
+          <h1 style="margin-bottom: 6px; font-size: 1.25rem;">Ideation Assistant</h1>
           <h2 style="margin: 20px 0; color: rgba(255, 255, 255, 0.9);">Select Your Group</h2>
         </div>
         
@@ -687,6 +681,7 @@
               <button id="group-9-btn" class="group-btn" data-workshop="futures" data-ai="chatbot">9</button>
               <!-- New mapping: 10=Futures+Medical, 12=Empathy+Medical, 13=Futures+Medical -->
               <button id="group-10-btn" class="group-btn" data-workshop="futures" data-ai="medical">10</button>
+              <button id="group-11-btn" class="group-btn" data-workshop="empathy" data-ai="medical">11</button>
               <button id="group-12-btn" class="group-btn" data-workshop="empathy" data-ai="medical">12</button>
               <button id="group-13-btn" class="group-btn" data-workshop="futures" data-ai="medical">13</button>
             </div>
@@ -706,7 +701,7 @@
       <div id="main-app-screen" class="container" style="display: none;">
       <!-- Main Header -->
       <div class="main-header">
-        <h1>🤖 AI Risk & Mitigation Assistant</h1>
+        <h1 style="margin-bottom: 1px; font-size: 1rem;">Ideation Assistant</h1>
         <div style="display: flex; justify-content: center; align-items: center; gap: 10px; margin-bottom: 8px;">
           <button id="help-btn" class="btn btn-utility" style="width: auto; padding: 4px 12px; font-size: 0.75rem;">❓ Help</button>
           <button id="change-group-btn" class="btn btn-utility" style="width: auto; padding: 4px 12px; font-size: 0.75rem;">🔄 Change Group</button>
@@ -784,12 +779,12 @@
         <div class="control-section" id="ai-suggestions-section">
           <div class="section-title">💡 AI Suggestions</div>
           <button id="suggest-new-risks-btn" class="btn btn-primary">⚠️ New Risk</button>
-          <button id="suggest-related-risks-btn" class="btn btn-primary">� Related Risk</button>
+          <button id="suggest-related-risks-btn" class="btn btn-primary">🔗 Related Risk</button>
           <button id="empathy-risks-btn" class="btn btn-primary" style="display: none;">⚠️ Persona-Based Risk</button>
           <button id="suggest-new-mitigations-btn" class="btn btn-mitigation">🛡️ New Mitigation</button>
-          <button id="suggest-related-mitigations-btn" class="btn btn-mitigation">� Related Mitigation</button>
+          <button id="suggest-related-mitigations-btn" class="btn btn-mitigation">🔗 Related Mitigation</button>
           <button id="suggest-new-benefits-btn" class="btn btn-benefit">🌟 New Benefit</button>
-          <button id="suggest-related-benefits-btn" class="btn btn-benefit">� Related Benefit</button>
+          <button id="suggest-related-benefits-btn" class="btn btn-benefit">🔗 Related Benefit</button>
           <button id="empathy-benefits-btn" class="btn btn-benefit" style="display: none;">✨ Persona-Based Benefit</button>
           <button id="empathy-mitigations-btn" class="btn btn-mitigation" style="display: none;">�️ Persona-Based Mitigations</button>
         </div>
@@ -800,8 +795,8 @@
           <button id="risk-mitigation-btn" class="btn btn-secondary" style="display: none;">� Generate Risk-Mitigation Pair</button>
           <button id="generate-ideas-btn" class="btn btn-secondary" style="display: none;">� Generate Neutral Idea</button>
           <button id="generate-random-idea-btn" class="btn btn-secondary">💡 What do you think AI?</button>
-          <button id="give-hint-btn" class="btn btn-secondary">� Give Hint</button>
-          <button id="related-incidents-btn" class="btn btn-secondary">� Related Real AI Incidents</button>
+          <button id="give-hint-btn" class="btn btn-secondary">💡 Give Hint</button>
+          <button id="related-incidents-btn" class="btn btn-secondary">📰 Related Real AI Incidents</button>
           <button id="auto-organize-btn" class="btn btn-secondary" disabled style="display: none;">🗂️ Auto-Organise</button>
           <button id="analyze-persona-btn" class="btn btn-primary" style="display: none;">🔍 Analyse Persona</button>
         </div>
@@ -820,7 +815,7 @@
       <!-- Final Organizational Tools (Full Width) -->
       <div style="margin-top: 12px;">
         <div class="control-section">
-          <div class="section-title">📊 Final Organizational Tools<br>(Leave until instructed!)</div>
+          <div class="section-title">📊 Final Organizational Tools</div>
           <button id="cluster-risks-btn" class="btn btn-secondary"> ️ Cluster Risks</button>
         </div>
 
@@ -865,8 +860,8 @@
         </div>
       </div>
 
-      <div style="text-align: center; margin-top: 8px;">
-        <button id="show-debug-btn" class="btn btn-utility" style="width: auto; padding: 4px 12px; font-size: 0.7rem;">Show Debug</button>
+      <div style="text-align: center; margin-top: 8px; display: block;">
+        <button id="show-debug-btn" class="btn btn-utility" style="width: auto; padding: 4px 12px; font-size: 0.7rem; display: inline-block;">Show Debug</button>
       </div>
 
       <!-- Core Analysis (moved below Show Debug) -->
@@ -970,7 +965,7 @@
       <button id="futures-wheel-btn"></button>
       </div> <!-- End main-app-screen -->
     </div> <!-- End app-container -->
-    
+    <script type="module" src="/src/index.js"></script>
     <script>
       // Debug logging helper
       const debugLog = (api, action, data) => {
@@ -987,7 +982,7 @@
       const MIRO_BOARD_ID = '';
       
       // Backend API URL
-      const BACKEND_API_URL = 'YOUR SERVER URL';
+      const BACKEND_API_URL = 'https://sanja7s.space/facilitator-ws/backend/openai-proxy.php';
       
       // Helper function to make secure API calls through backend
       async function callOpenAIAPI(requestBody) {
@@ -1126,7 +1121,7 @@ Help users brainstorm AI risks, mitigations, benefits, and ethical consideration
           changeGroupBtn
         });
         
-        const groupButtons = ['group-4-btn', 'group-5-btn', 'group-6-btn', 'group-7-btn', 'group-8-btn', 'group-9-btn', 'group-10-btn', 'group-12-btn', 'group-13-btn', 'group-demo-fw-btn', 'group-demo-em-btn'];
+        const groupButtons = ['group-4-btn', 'group-5-btn', 'group-6-btn', 'group-7-btn', 'group-8-btn', 'group-9-btn', 'group-10-btn', 'group-11-btn', 'group-12-btn', 'group-13-btn', 'group-demo-fw-btn', 'group-demo-em-btn'];
         
         console.log('Setting up group selection buttons...');
         
