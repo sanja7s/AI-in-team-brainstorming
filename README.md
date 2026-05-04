@@ -29,12 +29,14 @@ If you use this tool in your work, please cite the paper:
 
 ## Overview
 
-The Agentic Brainstorming Assistant integrates with Miro boards to facilitate various workshop formats and AI uses:
+The Agentic Brainstorming Assistant is developed following the three-stpe methodology below.
+
+![Methodology Overview](materials/methodology.jpg)
+
+It integrates with Miro boards to facilitate various workshop formats and AI uses.
 
 
 ### Workshop Formats
-
-![Methodology Overview](materials/methodology.jpg)
 
 - **Free-form Workshops**: Unstructured brainstorming
 - **Futures Wheel Workshops**: Explore cause-and-effect relationships and potential consequences
