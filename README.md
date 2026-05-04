@@ -84,10 +84,32 @@ The tool uses a comprehensive framework combining:
 ## Usage
 
 ### Setup
-1. Host the application locally or on a web server
-2. Configure Miro Developer Team to point to your application and give app permissions
-3. Install the app to your Miro team
-4. Configure API keys for GPT integration
+
+#### Setting up the Miro App (Hosting-side)
+
+1. Download the GitHub repository folder.
+2. Add your OpenAI API token to the `backend/openai-proxy.php` file.
+3. In the root directory, run:
+   ```bash
+   npm install
+   npm run start
+   ```
+   This will locally host the Miro application on `localhost`. For a quick way to test the app globally, create a free [ngrok](https://ngrok.com/) endpoint pointing to the port the app runs on. Alternatively, host the application on a server, storing the PHP file appropriately with your API key.
+
+#### Setting up the Miro App (Web/Miro-side)
+
+1. Go to your Miro account's **Apps** (also accessible via the [Miro API Developer page](https://developers.miro.com/)).
+
+2. Select **"Create new app"** and give it any name.
+
+3. Scroll down and fill in the address that the Miro app is hosted on (your `localhost` URL or ngrok endpoint).
+   > **Note:** A free way to globally test or host the app is to use an ngrok endpoint pointing to your localhost port.
+
+4. At the bottom of the app settings page, copy the **Share app link** and open it in your browser to install the app to your Miro team.
+
+5. Open a Miro canvas and click the bottom **"+"** icon (**Tools, Media and Integrations**). The app should now be available to use 🎉
+
+> **Troubleshooting:** If no responses appear (stickies, prompts, etc.), check that you have provided a valid OpenAI API key in `backend/openai-proxy.php`.
 
 ### Workshop Facilitation
 1. **Select Workshop Type**: Choose between Futures Wheel or Empathy Mapping
