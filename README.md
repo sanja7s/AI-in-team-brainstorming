@@ -108,6 +108,8 @@ The tool uses a comprehensive framework combining:
 
 ### Setup
 
+For a complete step-by-step walkthrough, see the [📋 instructions PDF](materials/instructions.pdf). Alternatively, follow the setup steps below.
+
 #### Setting up the Miro App (Hosting-side)
 
 1. Download the GitHub repository folder.
