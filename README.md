@@ -1,12 +1,35 @@
-# FlowGuide Brainstorming Assistant for Miro
+# Agentic Brainstorming Assistant for Miro
 
 <img src="materials/FlowGuide.png" alt="FlowGuide Logo" width="33%">
 
 A Miro-integrated workshop assistant that helps facilitate brainstorming sessions for impact assessment of AI systems. This tool supports structured workshop methods, and is co-designed to support the right points of AI interventions.
 
+## Research Paper & Citation
+
+This repository contains the code for the following paper:
+
+> **When and How AI Should Assist Brainstorming for AI Impact Assessment**
+> Jarod Govers, Sanja Šćepanović, Daniele Quercia
+> *ACM Conference on Fairness, Accountability, and Transparency (FAccT '26), June 25–28, 2026, Montreal, QC, Canada*
+> 📄 [arXiv:2604.27997](https://arxiv.org/abs/2604.27997) · DOI: [10.1145/3805689.3812299](https://doi.org/10.1145/3805689.3812299)
+
+If you use this tool in your work, please cite the paper:
+
+```bibtex
+@inproceedings{govers2026flowguide,
+  title     = {When and How {AI} Should Assist Brainstorming for {AI} Impact Assessment},
+  author    = {Govers, Jarod and \v{S}\'{c}epanovi\'{c}, Sanja and Quercia, Daniele},
+  booktitle = {Proceedings of the 2026 ACM Conference on Fairness, Accountability, and Transparency (FAccT '26)},
+  year      = {2026},
+  month     = {June},
+  address   = {Montreal, QC, Canada},
+  doi       = {10.1145/3805689.3812299}
+}
+```
+
 ## Overview
 
-FlowGuide integrates with Miro boards to facilitate various workshop formats and AI uses:
+The Agentic Brainstorming Assistant integrates with Miro boards to facilitate various workshop formats and AI uses:
 
 
 ### Workshop Formats
